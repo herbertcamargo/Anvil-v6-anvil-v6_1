@@ -8,6 +8,10 @@ import anvil.js
 if not hasattr(anvil, 'html_top_bar'):
   anvil.html_top_bar = html_top_barTemplate
 
+# Import and register our YouTube components
+from .YouTubeGrid import YouTubeGrid
+from .YouTubePlayer import YouTubePlayer
+
 class html_top_bar(html_top_barTemplate):
   def __init__(self, **properties):
     # Set Form properties and Data Bindings.

@@ -60,11 +60,11 @@ components:
   type: Label
 - layout_properties: {grid_position: 'ASDFGH,QWERTY'}
   name: yt_grid_container
-  properties: {}
+  properties: {spacing_above: large, visible: true}
   type: ColumnPanel
 - layout_properties: {grid_position: 'ZXCVBN,ASDFGH'}
   name: yt_player_container
-  properties: {}
+  properties: {spacing_above: large, visible: true}
   type: ColumnPanel
 container:
   properties: {col_widths: '{}'}
