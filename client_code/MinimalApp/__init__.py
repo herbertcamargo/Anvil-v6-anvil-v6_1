@@ -1,7 +1,6 @@
 from ._anvil_designer import MinimalAppTemplate
 from anvil import *
-from ..html_top_bar.YouTubeGrid import YouTubeGrid
-from ..html_top_bar.YouTubePlayer import YouTubePlayer
+import anvil.js
 
 class MinimalApp(MinimalAppTemplate):
   def __init__(self, **properties):
@@ -9,27 +8,179 @@ class MinimalApp(MinimalAppTemplate):
     # Set all panels visible
     self.show_all_panels()
     
-    # Initialize YouTube components
-    self.setup_youtube_components()
+    # Initialize video functionality
+    self.setup_youtube_functionality()
     
-  def setup_youtube_components(self):
-    """Set up YouTube related components"""
-    # Create YouTube grid component
-    self.youtube_grid = YouTubeGrid()
-    self.yt_grid_container.add_component(self.youtube_grid)
+  def setup_youtube_functionality(self):
+    """Set up YouTube functionality directly in the form"""
+    self.videos = []
     
-    # Create YouTube player component
-    self.youtube_player = YouTubePlayer()
-    self.yt_player_container.add_component(self.youtube_player)
+    # Set up click handler for the grid
+    self.yt_grid_container.tag.html = """
+    <style>
+      .yt-grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 20px;
+        padding: 20px;
+        width: 100%;
+      }
+      
+      .thumbnail-container {
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+        transition: transform 0.2s;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      
+      .thumbnail-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      }
+      
+      .thumbnail-image {
+        width: 100%;
+        aspect-ratio: 16/9;
+        object-fit: cover;
+      }
+      
+      .video-title {
+        padding: 10px;
+        margin: 0;
+        font-size: 14px;
+        font-weight: 500;
+        height: 3em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+    </style>
     
-    # Set up video selection handler
-    def handle_video_selected(video):
-      self.youtube_player.play_video(video)
-      # Scroll to player
-      self.yt_player_container.scroll_into_view()
+    <div class="yt-grid-container">
+      <!-- Video thumbnails will be inserted here dynamically -->
+    </div>
+    """
     
-    # Assign the handler to the grid
-    self.youtube_grid.video_selected = handle_video_selected
+    # Set up player container
+    self.yt_player_container.tag.html = """
+    <style>
+      .youtube-player-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+      
+      .video-title-display {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 10px 0;
+        padding: 0 10px;
+      }
+      
+      .youtube-player-container {
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        height: 0;
+        overflow: hidden;
+        border-radius: 8px;
+      }
+      
+      .youtube-iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 8px;
+      }
+    </style>
+    
+    <div class="youtube-player-wrapper">
+      <h2 class="video-title-display">Select a video to play</h2>
+      <div class="youtube-player-container">
+        <!-- YouTube iframe will be inserted here dynamically -->
+      </div>
+    </div>
+    """
+    
+  def update_youtube_grid(self, videos_data):
+    """Update the grid with new video data"""
+    self.videos = videos_data
+    
+    # Get the HTML container
+    grid_container = anvil.js.get_dom_node(self.yt_grid_container).querySelector('.yt-grid-container')
+    if not grid_container:
+      return
+      
+    # Clear existing content
+    grid_container.innerHTML = ''
+    
+    # Add new thumbnails (up to 12)
+    for i, video in enumerate(videos_data[:12]):
+      # Create thumbnail container
+      thumbnail_div = anvil.js.window.document.createElement('div')
+      thumbnail_div.className = 'thumbnail-container'
+      thumbnail_div.setAttribute('data-video-id', video.get('id', ''))
+      thumbnail_div.setAttribute('data-index', str(i))
+      
+      # Create thumbnail image
+      img = anvil.js.window.document.createElement('img')
+      img.src = video.get('thumbnail_url', 'https://via.placeholder.com/320x180')
+      img.alt = video.get('title', 'Video thumbnail')
+      img.className = 'thumbnail-image'
+      
+      # Create title element
+      title = anvil.js.window.document.createElement('p')
+      title.className = 'video-title'
+      title.textContent = video.get('title', 'Untitled video')
+      
+      # Add click event
+      thumbnail_div.addEventListener('click', self.create_thumbnail_click_handler(i))
+      
+      # Append elements to container
+      thumbnail_div.appendChild(img)
+      thumbnail_div.appendChild(title)
+      grid_container.appendChild(thumbnail_div)
+      
+  def create_thumbnail_click_handler(self, index):
+    """Create a click handler for a thumbnail at the specified index"""
+    def handler(event):
+      if index < len(self.videos):
+        self.play_video(self.videos[index])
+    return handler
+    
+  def play_video(self, video_data):
+    """Play the specified video"""
+    video_id = video_data.get('id')
+    if not video_id:
+      return
+      
+    # Update the iframe src with the new video ID
+    player_container = anvil.js.get_dom_node(self.yt_player_container).querySelector('.youtube-player-container')
+    if player_container:
+      player_container.innerHTML = f"""
+        <iframe 
+          src="https://www.youtube.com/embed/{video_id}?autoplay=1" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen
+          class="youtube-iframe">
+        </iframe>
+      """
+      
+    # Update video title if available
+    title_element = anvil.js.get_dom_node(self.yt_player_container).querySelector('.video-title-display')
+    if title_element and video_data.get('title'):
+      title_element.textContent = video_data.get('title')
+      
+    # Scroll to player
+    self.yt_player_container.scroll_into_view()
     
   def show_all_panels(self):
     """Show all panels"""
@@ -113,32 +264,14 @@ class MinimalApp(MinimalAppTemplate):
         'id': '09R8_2nJtjg',
         'title': f'Mock YouTube Result 9 for: {query}',
         'thumbnail_url': 'https://i.ytimg.com/vi/09R8_2nJtjg/mqdefault.jpg',
-      },
-      {
-        'id': 'mWRsgZuwf_8',
-        'title': f'Mock YouTube Result 10 for: {query}',
-        'thumbnail_url': 'https://i.ytimg.com/vi/mWRsgZuwf_8/mqdefault.jpg',
-      },
-      {
-        'id': 'e-ORhEE9VVg',
-        'title': f'Mock YouTube Result 11 for: {query}',
-        'thumbnail_url': 'https://i.ytimg.com/vi/e-ORhEE9VVg/mqdefault.jpg',
-      },
-      {
-        'id': 'QcIy9NiNbmo',
-        'title': f'Mock YouTube Result 12 for: {query}',
-        'thumbnail_url': 'https://i.ytimg.com/vi/QcIy9NiNbmo/mqdefault.jpg',
       }
     ]
     
     # Update the YouTube grid with new videos
-    self.youtube_grid.update_videos(videos)
+    self.update_youtube_grid(videos)
     
     # Show a notification
     Notification(f"Found {len(videos)} YouTube videos for '{query}'", timeout=3).show()
-    
-    # Scroll to see results
-    self.yt_grid_container.scroll_into_view()
     
     # Also show text search results for consistency
     self.results_panel.clear()
