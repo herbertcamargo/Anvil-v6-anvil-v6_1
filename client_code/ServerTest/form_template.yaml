@@ -1,32 +1,32 @@
-container:
-  type: ColumnPanel
-  properties: {col_widths: '{}'}
 components:
-- type: Label
-  properties: {text: Server Connection Test, role: headline, align: center}
+- layout_properties: {grid_position: 'RKWBSP,VUTSZX'}
   name: heading
-  layout_properties: {grid_position: 'RKWBSP,VUTSZX'}
-- type: Label
-  properties: {text: ''}
+  properties: {align: center, role: headline, text: Server Connection Test}
+  type: Label
+- layout_properties: {grid_position: 'QWERTY,ASDFGH'}
   name: info_label
-  layout_properties: {grid_position: 'QWERTY,ASDFGH'}
-- type: Button
-  properties: {text: Test Server Connection, role: primary}
-  name: test_button
+  properties: {text: ''}
+  type: Label
+- event_bindings: {click: test_button_click}
   layout_properties: {grid_position: 'HVGKOT,LPTPIJ'}
-  event_bindings: {click: test_button_click}
-- type: Button
-  properties: {text: Try Ping Test, role: secondary}
-  name: advanced_test_button
+  name: test_button
+  properties: {role: primary, text: Test Server Connection}
+  type: Button
+- event_bindings: {click: advanced_test_button_click}
   layout_properties: {grid_position: 'ZXCVBN,MNBVCX'}
-  event_bindings: {click: advanced_test_button_click}
-- type: Label
-  properties: {text: Click the button to test the server connection, align: center}
+  name: advanced_test_button
+  properties: {role: secondary, text: Try Ping Test}
+  type: Button
+- layout_properties: {grid_position: 'UFBWVH,IKSSLS'}
   name: result_label
-  layout_properties: {grid_position: 'UFBWVH,IKSSLS'}
-- type: Link
-  properties: {text: Return to main app, url: ''}
-  name: return_link
+  properties: {align: center, text: Click the button to test the server connection}
+  type: Label
+- event_bindings: {click: return_to_main_app}
   layout_properties: {grid_position: 'POIUYT,LKJHGF'}
-  event_bindings: {click: return_to_main_app}
-is_package: true 
+  name: return_link
+  properties: {text: Return to main app, url: ''}
+  type: Link
+container:
+  properties: {col_widths: '{}'}
+  type: ColumnPanel
+is_package: true
