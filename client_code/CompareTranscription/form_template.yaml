@@ -1,0 +1,90 @@
+components:
+- components:
+  - components:
+    - layout_properties: {grid_position: 'HTBGFT,WTLTFI'}
+      name: language_dropdown
+      properties:
+        margin: [null, '200', null, '200']
+      type: form:dep_gqlhr7sei7ys7:_Components.DropdownMenu
+    - layout_properties: {grid_position: 'ZEOPWA,YNKWMN'}
+      name: search_box
+      properties:
+        margin: ['20', '0', '10', '10']
+        placeholder: Search for a video...
+        role: outlined
+      type: TextBox
+    - event_bindings: {click: search_button_click}
+      layout_properties: {grid_position: 'ZEOPWA,BQSKNQ'}
+      name: search_button
+      properties:
+        role: outlined-button
+        spacing:
+          margin: ['20', null, '10', '0']
+          padding: ['5', '12', '5', '12']
+        text: Search
+      type: Button
+    - data_bindings:
+      - {code: 'self.item['''']', property: items, writeback: false}
+      layout_properties: {grid_position: 'PUKLKI,ZSKFQI'}
+      name: results_repeater
+      properties:
+        item_template: CompareTranscription.VideoResultCard
+        margin: [null, null, null, '10']
+      type: RepeatingPanel
+    - data_bindings: []
+      event_bindings: {change: user_input_box_change}
+      layout_properties: {grid_position: 'YWITLX,SIOAXT'}
+      name: user_input_box
+      properties:
+        auto_expand: false
+        height: '100'
+        margin: [null, '20', '20', '10']
+      type: TextArea
+    - layout_properties: {grid_position: 'TEWYML,RQLRRZ'}
+      name: compare_button
+      properties:
+        spacing:
+          margin: [null, null, '20', '10']
+        text: button_1
+      type: Button
+    - layout_properties: {grid_position: 'FKZTAU,SFRWYI'}
+      name: comparison_output
+      properties:
+        spacing:
+          margin: [null, '20', '20', '20']
+      type: RichText
+    - layout_properties: {grid_position: 'GVYVQS,CNSQGY'}
+      name: accuracy_label
+      properties:
+        spacing:
+          margin: [null, '5', '20', '20']
+      type: Label
+    - layout_properties: {grid_position: 'HWZASF,NDHPOZ'}
+      name: official_input_box
+      properties:
+        spacing:
+          margin: [null, '10', '10', '20']
+          padding: ['10', null, null, null]
+      type: form:dep_gqlhr7sei7ys7:_Components.Text
+    layout_properties: {width: 620.8892290039063}
+    name: content_panel
+    properties:
+      col_spacing: medium
+      col_widths: '{"YNKWMN":45,"BQSKNQ":15}'
+      spacing:
+        margin: ['50', '0', '20', '20']
+        padding: ['400', '20', '20', '5']
+      spacing_above: small
+      visible: true
+    type: ColumnPanel
+  layout_properties: {slot: nav-right}
+  name: navbar_links
+  properties:
+    spacing:
+      margin: ['20', '50', null, '50']
+      padding: [null, null, '150', null]
+  type: FlowPanel
+container:
+  properties: {html: '@theme:standard-page.html'}
+  type: HtmlTemplate
+is_package: true
