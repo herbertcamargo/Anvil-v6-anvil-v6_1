@@ -4,52 +4,36 @@ from anvil import *
 class MinimalApp(MinimalAppTemplate):
   def __init__(self, **properties):
     self.init_components(**properties)
-    # Set default view - show welcome panel only
-    self.show_welcome_panel()
-    
-  def show_welcome_panel(self):
-    """Show only the welcome panel"""
-    self.welcome_panel.visible = True
-    self.search_panel.visible = False
-    self.compare_panel.visible = False
+    # Set all panels visible
+    self.show_all_panels()
     
   def show_all_panels(self):
-    """Show all main panels (but not welcome)"""
-    self.welcome_panel.visible = False
+    """Show all panels"""
+    self.welcome_panel.visible = True
     self.search_panel.visible = True
-    self.compare_panel.visible = True
-    
-  def show_search_panel_only(self):
-    """Show only the search panel"""
-    self.welcome_panel.visible = False
-    self.search_panel.visible = True
-    self.compare_panel.visible = False
-    
-  def show_compare_panel_only(self):
-    """Show only the comparison panel"""
-    self.welcome_panel.visible = False
-    self.search_panel.visible = False
     self.compare_panel.visible = True
     
   def home_link_click(self, **event_args):
-    """Handle click on Home link"""
-    self.show_welcome_panel()
+    """Handle click on Home link - scroll to top"""
+    self.welcome_panel.scroll_into_view()
     
   def search_link_click(self, **event_args):
-    """Handle click on Search link"""
-    self.show_search_panel_only()
+    """Handle click on Search link - scroll to search section"""
+    self.search_panel.scroll_into_view()
     
   def comparison_link_click(self, **event_args):
-    """Handle click on Comparison link"""
-    self.show_compare_panel_only()
+    """Handle click on Comparison link - scroll to comparison section"""
+    self.compare_panel.scroll_into_view()
     
   def welcome_search_button_click(self, **event_args):
-    """Handle click on Start Searching button"""
-    self.show_search_panel_only()
+    """Handle click on Start Searching button - scroll to search section"""
+    self.search_panel.scroll_into_view()
+    self.search_box.focus()
     
   def welcome_compare_button_click(self, **event_args):
-    """Handle click on Practice Comparison button"""
-    self.show_compare_panel_only()
+    """Handle click on Practice Comparison button - scroll to comparison section"""
+    self.compare_panel.scroll_into_view()
+    self.text1_box.focus()
   
   def search_button_click(self, **event_args):
     """This method is called when the button is clicked"""
@@ -87,6 +71,9 @@ class MinimalApp(MinimalAppTemplate):
     # Show a notification
     Notification("Found 3 mock results", timeout=3).show()
     
+    # Scroll to see results
+    self.results_panel.scroll_into_view()
+    
   def compare_button_click(self, **event_args):
     """Compare texts without server calls"""
     text1 = self.text1_box.text
@@ -110,6 +97,9 @@ class MinimalApp(MinimalAppTemplate):
     # Show results
     self.result_label.text = f"{result} - Similarity: {accuracy}%"
     Notification("Comparison complete", timeout=3).show()
+    
+    # Scroll to see results
+    self.result_label.scroll_into_view()
 
   def open_server_test(self, **event_args):
     """Open the server test form"""
