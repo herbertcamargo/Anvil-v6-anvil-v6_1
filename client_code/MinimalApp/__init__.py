@@ -1,6 +1,8 @@
 from ._anvil_designer import MinimalAppTemplate
 from anvil import *
 import anvil.js
+from anvil.js.window import HTMLElement
+from anvil import Html, Button, Label
 
 class MinimalApp(MinimalAppTemplate):
   def __init__(self, **properties):
@@ -12,9 +14,38 @@ class MinimalApp(MinimalAppTemplate):
     self.setup_youtube_functionality()
     
     # Add debug button
-    self.debug_button = Button(text="Debug HTML", role="secondary")
+    self.debug_panel = FlowPanel()
+    self.debug_button = Button(text="Debug HTML", role="outlined-button")
     self.debug_button.set_event_handler('click', self.debug_html)
-    self.search_panel.add_component(self.debug_button, index=1)
+    self.debug_panel.add_component(self.debug_button)
+    
+    # Add test grid button
+    self.test_grid_button = Button(text="Create Test Grid", role="primary-color")
+    self.test_grid_button.set_event_handler('click', self.create_test_grid)
+    self.debug_panel.add_component(self.test_grid_button)
+    
+    # Add the debug panel to the search panel
+    self.search_panel.add_component(self.debug_panel, index=1)
+    
+  def create_test_grid(self, **event_args):
+    """Create a test grid with simple colored boxes"""
+    test_videos = []
+    
+    # Create 9 test videos with different colors
+    colors = ['red', 'blue', 'green', 'orange', 'purple', 'teal', 'pink', 'brown', 'gray']
+    
+    for i, color in enumerate(colors):
+      test_videos.append({
+        'id': f'test-{i}',
+        'title': f'Test Video {i+1} ({color})',
+        'thumbnail_url': f'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" style="background:{color}"><text x="50%" y="50%" fill="white" font-size="20" text-anchor="middle">Test {i+1}</text></svg>'
+      })
+    
+    # Update the grid with these test videos
+    self.update_youtube_grid(test_videos)
+    
+    # Scroll to the grid container
+    self.yt_grid_container.scroll_into_view()
     
   def debug_html(self, **event_args):
     """Debug HTML structure and components"""
@@ -178,28 +209,43 @@ class MinimalApp(MinimalAppTemplate):
     # Clear existing content
     grid_container.innerHTML = ''
     
-    # Try a simpler approach - create all thumbnails using a single innerHTML update
-    html_content = ""
-    
+    # Register the thumbnail click handler
+    self.grid_html.set_event_handler('x-thumbnail-click', self.thumbnail_click)
+      
+    # Try a simpler approach - create all thumbnails with direct click handlers
     for i, video in enumerate(videos_data[:12]):
       video_id = video.get('id', '')
       title = video.get('title', 'Untitled video')
       thumbnail_url = video.get('thumbnail_url', 'https://via.placeholder.com/320x180')
       
-      # Create the HTML for this thumbnail
-      html_content += f"""
-      <div class="thumbnail-container" data-video-id="{video_id}" data-index="{i}" onclick="anvil.call('thumbnail_click', {i})">
+      # Create the thumbnail div
+      thumbnail_div = anvil.js.window.document.createElement('div')
+      thumbnail_div.className = 'thumbnail-container'
+      thumbnail_div.setAttribute('data-video-id', video_id)
+      thumbnail_div.setAttribute('data-index', str(i))
+      
+      # Add the click event handler
+      thumbnail_div.addEventListener('click', self._create_js_thumbnail_handler(i))
+      
+      # Create the image and title elements
+      thumbnail_html = f"""
         <img src="{thumbnail_url}" alt="{title}" class="thumbnail-image">
         <p class="video-title">{title}</p>
-      </div>
       """
-    
-    # Set the HTML content
-    grid_container.innerHTML = html_content
+      thumbnail_div.innerHTML = thumbnail_html
       
-  def thumbnail_click(self, index):
+      # Add to the container
+      grid_container.appendChild(thumbnail_div)
+      
+  def _create_js_thumbnail_handler(self, index):
+    """Create a JavaScript event handler for thumbnail clicks"""
+    return anvil.js.create_js_function(lambda event: self.thumbnail_click(dict(index=index)))
+      
+  def thumbnail_click(self, **event_args):
     """Handle thumbnail click from HTML"""
-    if index < len(self.videos):
+    index = event_args.get('index', 0)
+    alert(f"Thumbnail clicked: {index}")
+    if 0 <= index < len(self.videos):
       self.play_video(self.videos[index])
     
   def play_video(self, video_data):

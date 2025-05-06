@@ -2,6 +2,8 @@ from ._anvil_designer import ServerTestTemplate
 from anvil import *
 import anvil.server
 import anvil.js
+from anvil.js.window import HTMLElement
+from anvil import Html, Button, Label, FlowPanel
 
 class ServerTest(ServerTestTemplate):
   def __init__(self, **properties):
@@ -10,6 +12,20 @@ class ServerTest(ServerTestTemplate):
     
     # Set up YouTube functionality
     self.setup_youtube_functionality()
+    
+    # Add debug functions
+    self.debug_panel = FlowPanel()
+    self.debug_button = Button(text="Debug HTML", role="outlined-button")
+    self.debug_button.set_event_handler('click', self.debug_html)
+    self.debug_panel.add_component(self.debug_button)
+    
+    # Add test grid button
+    self.test_grid_button = Button(text="Create Test Grid", role="primary-color")
+    self.test_grid_button.set_event_handler('click', self.create_test_grid)
+    self.debug_panel.add_component(self.test_grid_button)
+    
+    # Add the debug panel 
+    self.add_component(self.debug_panel, index=4)  # Place it after the search section heading
     
     # Try to call server functions to see if they work
     try:
@@ -24,6 +40,67 @@ class ServerTest(ServerTestTemplate):
       self.result_label.text = f"Error: {str(e)}"
       self.status_label.text = "Server functions are NOT working!"
       self.status_label.foreground = "#F44336"  # Red color
+      
+  def create_test_grid(self, **event_args):
+    """Create a test grid with simple colored boxes"""
+    test_videos = []
+    
+    # Create 9 test videos with different colors
+    colors = ['red', 'blue', 'green', 'orange', 'purple', 'teal', 'pink', 'brown', 'gray']
+    
+    for i, color in enumerate(colors):
+      test_videos.append({
+        'id': f'test-{i}',
+        'title': f'Test Video {i+1} ({color})',
+        'thumbnail_url': f'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" style="background:{color}"><text x="50%" y="50%" fill="white" font-size="20" text-anchor="middle">Test {i+1}</text></svg>'
+      })
+    
+    # Update the grid with these test videos
+    self.update_youtube_grid(test_videos)
+    
+    # Scroll to the grid container
+    self.yt_grid_container.scroll_into_view()
+    
+  def debug_html(self, **event_args):
+    """Debug HTML structure and components"""
+    try:
+      # Check if HTML components exist
+      html_status = "HTML components:\n"
+      html_status += f"Grid HTML exists: {hasattr(self, 'grid_html')}\n"
+      html_status += f"Player HTML exists: {hasattr(self, 'player_html')}\n"
+      
+      # Check containers
+      container_status = "Containers:\n"
+      container_status += f"Grid container exists: {self.yt_grid_container is not None}\n"
+      container_status += f"Player container exists: {self.yt_player_container is not None}\n"
+      
+      # Check DOM elements
+      dom_status = "DOM elements:\n"
+      grid_container = None
+      player_container = None
+      
+      try:
+        grid_container = anvil.js.get_dom_node(self.grid_html).querySelector('.yt-grid-container')
+        dom_status += f"Grid container DOM element exists: {grid_container is not None}\n"
+      except:
+        dom_status += "Error accessing grid container DOM element\n"
+        
+      try:
+        player_container = anvil.js.get_dom_node(self.player_html).querySelector('.youtube-player-container')
+        dom_status += f"Player container DOM element exists: {player_container is not None}\n"
+      except:
+        dom_status += "Error accessing player container DOM element\n"
+        
+      # Show complete status
+      alert(f"{html_status}\n{container_status}\n{dom_status}")
+      
+      # Try to add a test thumbnail
+      if grid_container:
+        grid_container.innerHTML = '<div style="background-color: red; color: white; padding: 20px; margin: 10px;">Test Thumbnail</div>'
+        alert("Added test thumbnail - check if it's visible")
+      
+    except Exception as e:
+      alert(f"Debug error: {str(e)}")
       
   def setup_youtube_functionality(self):
     """Set up YouTube functionality directly in the form"""
@@ -146,28 +223,43 @@ class ServerTest(ServerTestTemplate):
     # Clear existing content
     grid_container.innerHTML = ''
     
-    # Try a simpler approach - create all thumbnails using a single innerHTML update
-    html_content = ""
-    
+    # Register the thumbnail click handler
+    self.grid_html.set_event_handler('x-thumbnail-click', self.thumbnail_click)
+      
+    # Try a simpler approach - create all thumbnails with direct click handlers
     for i, video in enumerate(videos_data[:12]):
       video_id = video.get('id', '')
       title = video.get('title', 'Untitled video')
       thumbnail_url = video.get('thumbnail_url', 'https://via.placeholder.com/320x180')
       
-      # Create the HTML for this thumbnail
-      html_content += f"""
-      <div class="thumbnail-container" data-video-id="{video_id}" data-index="{i}" onclick="anvil.call('thumbnail_click', {i})">
+      # Create the thumbnail div
+      thumbnail_div = anvil.js.window.document.createElement('div')
+      thumbnail_div.className = 'thumbnail-container'
+      thumbnail_div.setAttribute('data-video-id', video_id)
+      thumbnail_div.setAttribute('data-index', str(i))
+      
+      # Add the click event handler
+      thumbnail_div.addEventListener('click', self._create_js_thumbnail_handler(i))
+      
+      # Create the image and title elements
+      thumbnail_html = f"""
         <img src="{thumbnail_url}" alt="{title}" class="thumbnail-image">
         <p class="video-title">{title}</p>
-      </div>
       """
-    
-    # Set the HTML content
-    grid_container.innerHTML = html_content
+      thumbnail_div.innerHTML = thumbnail_html
       
-  def thumbnail_click(self, index):
+      # Add to the container
+      grid_container.appendChild(thumbnail_div)
+      
+  def _create_js_thumbnail_handler(self, index):
+    """Create a JavaScript event handler for thumbnail clicks"""
+    return anvil.js.create_js_function(lambda event: self.thumbnail_click(dict(index=index)))
+      
+  def thumbnail_click(self, **event_args):
     """Handle thumbnail click from HTML"""
-    if index < len(self.videos):
+    index = event_args.get('index', 0)
+    alert(f"Thumbnail clicked: {index}")
+    if 0 <= index < len(self.videos):
       self.play_video(self.videos[index])
     
   def play_video(self, video_data):
