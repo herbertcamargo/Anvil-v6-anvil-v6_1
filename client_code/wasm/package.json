@@ -1,0 +1,14 @@
+{
+  "name": "anvil-wasm-video-processor",
+  "version": "1.0.0",
+  "description": "WebAssembly video processing module for Anvil applications",
+  "scripts": {
+    "minify": "node minify.js",
+    "copy-wrapper": "node -e \"require('fs').copyFileSync('src/video_processor_wrapper.js', '../../theme/wasm/video_processor_wrapper.js')\"",
+    "build-wrapper": "npm run minify",
+    "build": "echo 'Please use build.ps1 or build.sh to build the WebAssembly module'"
+  },
+  "devDependencies": {
+    "uglify-js": "^3.17.4"
+  }
+} 

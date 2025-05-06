@@ -1,8 +1,9 @@
 import { createApp } from 'vue';
 import TodoList from './TodoList.vue';
+import VideoProcessor from './VideoProcessor.vue';
 
 // Export component classes for individual usage
-export { TodoList };
+export { TodoList, VideoProcessor };
 
 // Function to render a Vue component into a DOM element
 export function renderComponent(componentName, containerId, props = {}) {
@@ -13,7 +14,8 @@ export function renderComponent(componentName, containerId, props = {}) {
   }
 
   const components = {
-    TodoList: TodoList
+    TodoList: TodoList,
+    VideoProcessor: VideoProcessor
   };
 
   const Component = components[componentName];

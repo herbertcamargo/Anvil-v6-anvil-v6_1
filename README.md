@@ -15,6 +15,7 @@ In this guide, we'll walk through the key components of the template, covering:
 - **[Testing The App](#testing-the-app)**: Test the integration and explore the template's functionality from a user's perspective. 
 - **[Make The app Your Own](#making-the-app-your-own)**: With the integration set up, it's time to make the app your own.
 - **[Using React/Vue Components](#using-reactvue-components)**: Create rich, interactive UI components using React or Vue.
+- **[Using WebAssembly](#using-webassembly)**: High-performance operations like video processing using WebAssembly.
 
 ## Introduction
 
@@ -287,3 +288,55 @@ anvil.js.call_js('window.renderVueComponent', 'ComponentName', 'container-id', p
 ```
 
 See `client_code/components/README.md` for detailed instructions.
+
+## Using WebAssembly
+
+This template also includes support for WebAssembly, enabling high-performance operations like client-side video processing. WebAssembly modules run at near-native speed, making them ideal for computationally intensive tasks that would be too slow in JavaScript.
+
+### Setup
+
+To build the WebAssembly modules, you'll need:
+
+1. [Emscripten SDK](https://emscripten.org/docs/getting_started/downloads.html) - for compiling C/C++ to WebAssembly
+2. [CMake](https://cmake.org/download/) - for building the C/C++ code
+3. [Node.js and npm](https://nodejs.org/) - for JavaScript tooling
+
+Once installed, navigate to the WebAssembly directory and run the build script:
+
+```
+# On Windows
+cd client_code/wasm
+./build.ps1
+
+# On Mac/Linux
+cd client_code/wasm
+chmod +x build.sh
+./build.sh
+```
+
+### Video Processing Demo
+
+The template includes a demo of WebAssembly-powered video processing with these features:
+
+1. **Grayscale Filter** - Convert video to grayscale
+2. **Sepia Filter** - Apply a sepia tone effect
+3. **Brightness Adjustment** - Control the brightness level
+4. **Blur Effect** - Apply a box blur effect with adjustable radius
+
+These operations are performed in real-time on client-side video with high performance.
+
+### Using in Your App
+
+The easiest way to use WebAssembly video processing is through the provided React and Vue components:
+
+```python
+import anvil.js
+
+# For React
+anvil.js.call_js('window.renderReactComponent', 'VideoProcessor', 'container-id')
+
+# For Vue
+anvil.js.call_js('window.renderVueComponent', 'VideoProcessor', 'container-id')
+```
+
+For more advanced usage and direct WebAssembly access, see `client_code/wasm/README.md` for detailed instructions.

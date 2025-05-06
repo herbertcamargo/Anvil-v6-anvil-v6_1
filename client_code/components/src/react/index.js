@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import TodoList from './TodoList';
+import VideoProcessor from './VideoProcessor';
 
 // Export component classes for individual usage
-export { TodoList };
+export { TodoList, VideoProcessor };
 
 // Function to render a React component into a DOM element
 export function renderComponent(componentName, containerId, props = {}) {
@@ -14,7 +15,8 @@ export function renderComponent(componentName, containerId, props = {}) {
   }
 
   const components = {
-    TodoList: TodoList
+    TodoList: TodoList,
+    VideoProcessor: VideoProcessor
   };
 
   const Component = components[componentName];

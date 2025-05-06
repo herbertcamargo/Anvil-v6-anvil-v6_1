@@ -15,7 +15,7 @@ container:
     components:
     - type: Label
       properties:
-        text: React Component
+        text: React Component - Todo List
         font_size: 20
         align: center
       name: react_label
@@ -29,7 +29,7 @@ container:
       name: spacer_1
     - type: Label
       properties:
-        text: Vue Component
+        text: Vue Component - Todo List
         font_size: 20
         align: center
       name: vue_label
@@ -37,4 +37,38 @@ container:
       properties:
         html: <div id="vue-container" style="width: 100%; min-height: 300px;"></div>
       name: vue_container
+    - type: Spacer
+      properties:
+        height: 50
+      name: spacer_2
+    - type: Label
+      properties:
+        text: WebAssembly Video Processing
+        font_size: 24
+        align: center
+      name: wasm_title_label
+    - type: Label
+      properties:
+        text: React Component - WebAssembly Video Processor
+        font_size: 20
+        align: center
+      name: react_wasm_label
+    - type: Html
+      properties:
+        html: <div id="react-video-processor" style="width: 100%; min-height: 400px;"></div>
+      name: react_video_processor
+    - type: Spacer
+      properties:
+        height: 30
+      name: spacer_3
+    - type: Label
+      properties:
+        text: Vue Component - WebAssembly Video Processor
+        font_size: 20
+        align: center
+      name: vue_wasm_label
+    - type: Html
+      properties:
+        html: <div id="vue-video-processor" style="width: 100%; min-height: 400px;"></div>
+      name: vue_video_processor
 is_package: true 
