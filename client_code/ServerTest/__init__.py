@@ -3,7 +3,6 @@ from anvil import *
 import anvil.server
 import anvil.js
 from anvil.js.window import HTMLElement
-from anvil import Html, Button, Label, FlowPanel
 
 class ServerTest(ServerTestTemplate):
   def __init__(self, **properties):
@@ -108,7 +107,8 @@ class ServerTest(ServerTestTemplate):
     
     # Create HTML components for grid and player
     self.yt_grid_container.clear()
-    self.grid_html = Html(parent=self.yt_grid_container)
+    self.grid_html = HtmlPanel()
+    self.yt_grid_container.add_component(self.grid_html)
     self.grid_html.html = """
     <style>
       .yt-grid-container {
@@ -162,7 +162,8 @@ class ServerTest(ServerTestTemplate):
     
     # Set up player container
     self.yt_player_container.clear()
-    self.player_html = Html(parent=self.yt_player_container)
+    self.player_html = HtmlPanel()
+    self.yt_player_container.add_component(self.player_html)
     self.player_html.html = """
     <style>
       .youtube-player-wrapper {
