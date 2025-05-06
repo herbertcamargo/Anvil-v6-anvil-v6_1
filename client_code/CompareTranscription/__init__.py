@@ -7,7 +7,7 @@ import anvil.users
 class CompareTranscription(CompareTranscriptionTemplate):
   def __init__(self, **properties):
     self.init_components(**properties)
-    # Initialize language dropdown  
+    # Initialize language dropdown     a
     self.language_dropdown.items = [
       ('English', 'en'),
       ('Spanish', 'es'),
