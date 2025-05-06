@@ -1,4 +1,11 @@
 components:
+- name: html_top_bar_1
+  properties: {}
+  type: html_top_bar
+- layout_properties: {grid_position: 'CCCCCC,DDDDDD'}
+  name: nav_spacer
+  properties: {height: 20}
+  type: Spacer
 - layout_properties: {grid_position: 'RKWBSP,VUTSZX'}
   name: heading
   properties: {align: center, role: headline, text: Server Connection Test}

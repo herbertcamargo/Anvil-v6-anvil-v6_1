@@ -104,3 +104,7 @@ class MinimalApp(MinimalAppTemplate):
   def open_server_test(self, **event_args):
     """Open the server test form"""
     open_form('ServerTest') 
+    
+  def account_link_click(self, **event_args):
+    """Open the account management form"""
+    open_form('AccountManagement') 

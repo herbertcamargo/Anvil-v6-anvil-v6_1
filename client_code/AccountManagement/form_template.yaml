@@ -1,4 +1,8 @@
 components_by_slot:
+  navbar_slot:
+  - name: html_top_bar_1
+    properties: {}
+    type: html_top_bar
   content_slot:
   - layout_properties: {}
     name: name_heading
