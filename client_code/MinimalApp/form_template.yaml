@@ -3,38 +3,86 @@ container:
   properties: {col_widths: '{}'}
 components:
 - type: FlowPanel
-  properties: {role: card, background: primary, spacing: medium}
+  properties: {role: default, background: primary, spacing: large, align: center}
   name: nav_bar
   layout_properties: {grid_position: 'AAAAAA,BBBBBB'}
   components:
   - type: Label
-    properties: {text: Transcription App, role: title, foreground: white, bold: true}
+    properties: {text: Transcription App, role: title, foreground: white, bold: true, font_size: 20}
     name: app_logo
     layout_properties: {}
+  - type: Spacer
+    properties: {height: 0, width: 20}
+    name: spacer_1
+    layout_properties: {}
   - type: Link
-    properties: {text: Home, foreground: white, bold: true}
+    properties: {text: Home, foreground: white, bold: true, font_size: 16, icon: 'fa:home'}
     name: home_link
     layout_properties: {}
     event_bindings: {click: home_link_click}
+  - type: Spacer
+    properties: {height: 0, width: 10}
+    name: spacer_2
+    layout_properties: {}
   - type: Link
-    properties: {text: Search, foreground: white, bold: true}
+    properties: {text: Search, foreground: white, bold: true, font_size: 16, icon: 'fa:search'}
     name: search_link
     layout_properties: {}
     event_bindings: {click: search_link_click}
+  - type: Spacer
+    properties: {height: 0, width: 10}
+    name: spacer_3
+    layout_properties: {}
   - type: Link
-    properties: {text: Comparison, foreground: white, bold: true}
+    properties: {text: Comparison, foreground: white, bold: true, font_size: 16, icon: 'fa:exchange'}
     name: comparison_link
     layout_properties: {}
     event_bindings: {click: comparison_link_click}
+  - type: Spacer
+    properties: {height: 0, width: 10}
+    name: spacer_4
+    layout_properties: {}
   - type: Link
-    properties: {text: Server Test, foreground: white, bold: true}
+    properties: {text: Server Test, foreground: white, bold: true, font_size: 16, icon: 'fa:server'}
     name: server_test_link
     layout_properties: {}
     event_bindings: {click: open_server_test}
-- type: Label
-  properties: {text: Minimal Transcription App (Client-side Only), role: headline, align: center}
-  name: title_label
+- type: Spacer
+  properties: {height: 20}
+  name: nav_spacer
+  layout_properties: {grid_position: 'CCCCCC,DDDDDD'}
+- type: ColumnPanel
+  properties: {role: card, visible: true}
+  name: welcome_panel
   layout_properties: {grid_position: 'WERTYU,ASDFGH'}
+  components:
+  - type: Label
+    properties: {text: Welcome to Transcription App, role: headline, align: center, font_size: 24}
+    name: welcome_title
+    layout_properties: {grid_position: 'QAZWSX,EDCRFV'}
+  - type: Label
+    properties: {text: This client-side application helps you practice transcription and search for videos., align: center}
+    name: welcome_text
+    layout_properties: {grid_position: 'TGBYHN,UJMIKOL'}
+  - type: Image
+    properties: {source: 'https://img.icons8.com/color/96/000000/microphone--v1.png', width: 96, align: center}
+    name: welcome_image
+    layout_properties: {grid_position: 'RFVTGB,YHNUJM'}
+  - type: FlowPanel
+    properties: {align: center, spacing: large}
+    name: welcome_buttons
+    layout_properties: {grid_position: 'ZXCVBN,MLKJHG'}
+    components:
+    - type: Button
+      properties: {text: Start Searching, role: primary, icon: 'fa:search'}
+      name: welcome_search_button
+      layout_properties: {}
+      event_bindings: {click: welcome_search_button_click}
+    - type: Button
+      properties: {text: Practice Comparison, role: primary-color, icon: 'fa:exchange'}
+      name: welcome_compare_button
+      layout_properties: {}
+      event_bindings: {click: welcome_compare_button_click}
 - type: ColumnPanel
   properties: {role: card, visible: true}
   name: search_panel

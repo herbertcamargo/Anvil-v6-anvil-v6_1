@@ -4,7 +4,53 @@ from anvil import *
 class MinimalApp(MinimalAppTemplate):
   def __init__(self, **properties):
     self.init_components(**properties)
+    # Set default view - show welcome panel only
+    self.show_welcome_panel()
     
+  def show_welcome_panel(self):
+    """Show only the welcome panel"""
+    self.welcome_panel.visible = True
+    self.search_panel.visible = False
+    self.compare_panel.visible = False
+    
+  def show_all_panels(self):
+    """Show all main panels (but not welcome)"""
+    self.welcome_panel.visible = False
+    self.search_panel.visible = True
+    self.compare_panel.visible = True
+    
+  def show_search_panel_only(self):
+    """Show only the search panel"""
+    self.welcome_panel.visible = False
+    self.search_panel.visible = True
+    self.compare_panel.visible = False
+    
+  def show_compare_panel_only(self):
+    """Show only the comparison panel"""
+    self.welcome_panel.visible = False
+    self.search_panel.visible = False
+    self.compare_panel.visible = True
+    
+  def home_link_click(self, **event_args):
+    """Handle click on Home link"""
+    self.show_welcome_panel()
+    
+  def search_link_click(self, **event_args):
+    """Handle click on Search link"""
+    self.show_search_panel_only()
+    
+  def comparison_link_click(self, **event_args):
+    """Handle click on Comparison link"""
+    self.show_compare_panel_only()
+    
+  def welcome_search_button_click(self, **event_args):
+    """Handle click on Start Searching button"""
+    self.show_search_panel_only()
+    
+  def welcome_compare_button_click(self, **event_args):
+    """Handle click on Practice Comparison button"""
+    self.show_compare_panel_only()
+  
   def search_button_click(self, **event_args):
     """This method is called when the button is clicked"""
     # Use client-side only functionality - no server calls
@@ -24,6 +70,7 @@ class MinimalApp(MinimalAppTemplate):
       # Create a card for each mock result
       card = ColumnPanel(spacing="medium")
       card.border = "1px solid #ddd"
+      # Set padding using spacing property instead of direct padding attribute
       card.spacing = ("medium", "medium", "medium", "medium")
       card.spacing_below = "medium"
       
