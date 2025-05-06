@@ -42,10 +42,7 @@ db_schema:
       type: string
     server: full
     title: Users
-dependencies:
-- dep_id: dep_x3i3kx9x6jthb
-  resolution_hints: {app_id: BZ6QPIGOFVUUSC2R, name: SaaS Template, package_name: SaaS_Template}
-  version: {branch: master}
+dependencies: []
 metadata: {description: 'For information on how to use this template, see our guide here: https://anvil.works/learn/tutorials/using-saas-template'}
 name: anvil-v6
 native_deps: null
