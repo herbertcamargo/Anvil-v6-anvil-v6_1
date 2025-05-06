@@ -1,4 +1,35 @@
 components:
+- type: FlowPanel
+  properties: {role: default, background: primary, spacing: large, align: center}
+  name: nav_bar
+  layout_properties: {grid_position: 'AAAAAA,BBBBBB'}
+  components:
+  - type: Label
+    properties: {text: Transcription App, role: title, foreground: white, bold: true, font_size: 20}
+    name: app_logo
+    layout_properties: {}
+  - type: Spacer
+    properties: {height: 0, width: 20}
+    name: spacer_1
+    layout_properties: {}
+  - type: Link
+    properties: {text: Search, foreground: white, bold: true, font_size: 16, icon: 'fa:search'}
+    name: search_link
+    layout_properties: {}
+    event_bindings: {click: search_link_click}
+  - type: Spacer
+    properties: {height: 0, width: 10}
+    name: spacer_3
+    layout_properties: {}
+  - type: Link
+    properties: {text: Comparison, foreground: white, bold: true, font_size: 16, icon: 'fa:exchange'}
+    name: comparison_link
+    layout_properties: {}
+    event_bindings: {click: comparison_link_click}
+- type: Spacer
+  properties: {height: 20}
+  name: nav_spacer
+  layout_properties: {grid_position: 'CCCCCC,DDDDDD'}
 - components:
   - components:
     - layout_properties: {grid_position: 'HTBGFT,WTLTFI'}

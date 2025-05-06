@@ -35,6 +35,16 @@ class CompareTranscription(CompareTranscriptionTemplate):
     # For now, just show a notification
     Notification(f"Loading video with ID: {video_id}", timeout=3).show()
 
+  def search_link_click(self, **event_args):
+    """Show search section"""
+    # No need to navigate, just scroll to search
+    self.search_box.focus()
+    
+  def comparison_link_click(self, **event_args):
+    """Show comparison section"""
+    # No need to navigate, just scroll to comparison
+    self.user_input_box.focus()
+
   def compare_button_click(self, **event_args):
     try:
       user_text = self.user_input_box.text
@@ -64,6 +74,8 @@ class CompareTranscription(CompareTranscriptionTemplate):
       Notification("Comparison complete", timeout=2).show()
     except Exception as e:
       alert(f"Error comparing texts: {str(e)}")
+      # Fall back to client-side comparison if server fails
+      self._client_side_comparison(user_text, official_text)
 
   def search_button_click(self, **event_args):
     try:
@@ -72,31 +84,26 @@ class CompareTranscription(CompareTranscriptionTemplate):
         alert("Please enter a search term.")
         return
 
-      # Try a completely minimal test first
+      # First test the server connection with a simple function
       try:
         Notification("Testing minimal server function...", timeout=2).show()
         minimal_result = anvil.server.call('minimal_test')
         Notification(f"Minimal test result: {minimal_result}", timeout=2).show()
       except Exception as e:
-        alert(f"Minimal server test failed: {str(e)}")
+        # If server test fails, fall back to client-side search
+        Notification("Server unavailable. Using client-side search.", timeout=3).show()
+        self._client_side_search(query)
         return
 
-      # First test the server connection with a simple function
-      try:
-        Notification("Testing server connection...", timeout=2).show()
-        test_result = anvil.server.call('test_server_function')
-        Notification(f"Server test: {test_result['message']}", timeout=2).show()
-      except Exception as e:
-        alert(f"Server connection test failed: {str(e)}")
-        return
-
-      # If server test passed, try the search
+      # Try the actual search
       try:
         Notification("Searching for videos...", timeout=2).show()
         results = anvil.server.call('search_youtube_videos', query)
         Notification(f"Search returned {len(results)} results", timeout=2).show()
       except Exception as e:
-        alert(f"Server search error: {str(e)}")
+        # If server search fails, fall back to client-side search
+        Notification("Server search failed. Using client-side search.", timeout=3).show()
+        self._client_side_search(query)
         return
       
       # Create results display
@@ -110,10 +117,11 @@ class CompareTranscription(CompareTranscriptionTemplate):
         
         # Add each video as a simple card
         for video in results:
-          # Create a card for each video
+          # Create a card for each mock result
           card = ColumnPanel(spacing="medium")
           card.border = "1px solid #ddd"
-          card.padding = 10
+          # Set spacing to emulate padding
+          card.spacing = ("medium", "medium", "medium", "medium")
           card.spacing_below = "medium"
           
           # Create a placeholder image that won't cause errors
@@ -138,32 +146,72 @@ class CompareTranscription(CompareTranscriptionTemplate):
           
           # Add the card to the results container
           results_container.add_component(card)
-      
-      # Replace the existing results with the new ones
-      self.content_panel.clear()
-      
-      # Create a search controls panel
-      search_controls = FlowPanel()
-      search_controls.add_component(self.language_dropdown)
-      search_controls.add_component(self.search_box)
-      search_controls.add_component(self.search_button)
-      
-      self.content_panel.add_component(search_controls)
-      self.content_panel.add_component(results_container)
-      
-      # Add the transcription components
-      transcription_panel = ColumnPanel()
-      transcription_panel.add_component(self.user_input_box)
-      transcription_panel.add_component(self.compare_button)
-      transcription_panel.add_component(self.comparison_output)
-      transcription_panel.add_component(self.accuracy_label)
-      transcription_panel.add_component(self.official_input_box)
-      
-      self.content_panel.add_component(transcription_panel)
+          
+      # Update the repeater with the results
+      self.results_repeater.items = results
       
     except Exception as e:
       # If an error occurs, display it
       alert(f"Error processing search results: {str(e)}")
+      # Fall back to client-side search
+      self._client_side_search(query)
+      
+  def _client_side_search(self, query):
+    """Fallback client-side search when server is unavailable"""
+    # Create mock results without calling the server
+    results = []
+    self.results_repeater.items = results
+    
+    # Create a results panel
+    results_panel = ColumnPanel()
+    
+    # Add a heading
+    results_panel.add_component(Label(text=f"Results for: {query} (Client-side mock)", role="heading"))
+    
+    # Add some mock results
+    for i in range(3):
+      # Create a card for each mock result
+      card = ColumnPanel()
+      card.spacing_above = "medium"
+      card.spacing_below = "medium"
+      card.border = "1px solid #ddd"
+      
+      # Add mock title and info
+      title = Label(text=f"Mock result {i+1} for {query}", role="heading")
+      title.bold = True
+      info = Label(text="This is a client-side only mock result (no server call)")
+      
+      card.add_component(title)
+      card.add_component(info)
+      
+      results_panel.add_component(card)
+    
+    # Replace results_repeater with this panel
+    parent = self.results_repeater.parent
+    index = parent.get_components().index(self.results_repeater)
+    parent.remove_component(self.results_repeater)
+    parent.add_component(results_panel, index=index)
+    
+    # Show a notification
+    Notification("Found 3 mock results (client-side only)", timeout=3).show()
+    
+  def _client_side_comparison(self, text1, text2):
+    """Fallback client-side comparison when server is unavailable"""
+    # Simple client-side comparison
+    if text1 == text2:
+      result = "Texts are identical"
+      accuracy = 100
+    else:
+      result = "Texts differ"
+      # Very simple difference calculation
+      common_chars = sum(1 for a, b in zip(text1, text2) if a == b)
+      max_len = max(len(text1), len(text2))
+      accuracy = round((common_chars / max_len) * 100, 1) if max_len > 0 else 0
+    
+    # Show results
+    self.comparison_output.content = f"<span style='color:blue'>CLIENT-SIDE COMPARISON:</span><br>{result}"
+    self.accuracy_label.text = f"Similarity: {accuracy}% (client-side calculation)"
+    Notification("Completed client-side comparison", timeout=3).show()
 
   def user_input_box_change(self, **event_args):
     """This method is called when the text in this text area is edited"""
