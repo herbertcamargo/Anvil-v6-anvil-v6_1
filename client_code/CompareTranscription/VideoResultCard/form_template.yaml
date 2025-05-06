@@ -15,7 +15,7 @@ components:
       padding: ['5', '5', '5', '5']
     style: label
     visible: true
-  type: form:dep_gqlhr7sei7ys7:_Components.Text
+  type: Label
 container:
   event_bindings: {show: form_show}
   type: ColumnPanel

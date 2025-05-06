@@ -57,6 +57,18 @@ class HomepageLayout(HomepageLayoutTemplate):
     """This method is called when the component is clicked"""
     alert(StripePricing(), large=True)
     self.check_upgrade_nav_link()
+    
+  def calculator_link_click(self, **event_args):
+    """This method is called when the calculator link is clicked"""
+    open_form('Calculator')
+    
+  def transcription_practice_link_click(self, **event_args):
+    """This method is called when the transcription practice link is clicked"""
+    open_form('TranscriptionPractice')
+    
+  def account_link_click(self, **event_args):
+    """This method is called when the account link is clicked"""
+    open_form('AccountManagement')
 
   def form_show(self, **event_args):
     self.check_upgrade_nav_link()
@@ -93,11 +105,11 @@ class HomepageLayout(HomepageLayoutTemplate):
       Notification(f"Error searching videos: {e}", style="danger", timeout=5).show()
 
   def _make_home_video_result_card(self, video):
-    from anvil import ColumnPanel, Image, Text
+    from anvil import ColumnPanel, Image, Label
     panel = ColumnPanel()
     img = Image(source=video['thumbnail'], width=160, height=90)
-    title = Text(text=video['title'], bold=True)
-    channel = Text(text=f"Channel: {video['channel']}", font_size=12)
+    title = Label(text=video['title'], bold=True)
+    channel = Label(text=f"Channel: {video['channel']}", font_size=12)
     panel.add_component(img)
     panel.add_component(title)
     panel.add_component(channel)
