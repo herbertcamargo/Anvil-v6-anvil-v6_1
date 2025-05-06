@@ -29,8 +29,10 @@ class ServerTest(ServerTestTemplate):
     """Set up YouTube functionality directly in the form"""
     self.videos = []
     
-    # Set up click handler for the grid
-    self.yt_grid_container.tag.html = """
+    # Create HTML components for grid and player
+    self.yt_grid_container.clear()
+    self.grid_html = Html(parent=self.yt_grid_container)
+    self.grid_html.html = """
     <style>
       .yt-grid-container {
         display: grid;
@@ -48,6 +50,7 @@ class ServerTest(ServerTestTemplate):
         border-radius: 8px;
         overflow: hidden;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        background-color: white;
       }
       
       .thumbnail-container:hover {
@@ -81,7 +84,9 @@ class ServerTest(ServerTestTemplate):
     """
     
     # Set up player container
-    self.yt_player_container.tag.html = """
+    self.yt_player_container.clear()
+    self.player_html = Html(parent=self.yt_player_container)
+    self.player_html.html = """
     <style>
       .youtube-player-wrapper {
         display: flex;
@@ -123,51 +128,47 @@ class ServerTest(ServerTestTemplate):
     </div>
     """
     
+    # Add headings to make the sections clearer
+    self.yt_grid_container.add_component(Label(text="YouTube Video Results", role="heading"), index=0)
+    self.yt_player_container.add_component(Label(text="Video Player", role="heading"), index=0)
+    
   def update_youtube_grid(self, videos_data):
     """Update the grid with new video data"""
     self.videos = videos_data
     
     # Get the HTML container
-    grid_container = anvil.js.get_dom_node(self.yt_grid_container).querySelector('.yt-grid-container')
+    grid_container = anvil.js.get_dom_node(self.grid_html).querySelector('.yt-grid-container')
     if not grid_container:
+      print("Error: Could not find grid container")
+      alert("Could not find grid container")
       return
       
     # Clear existing content
     grid_container.innerHTML = ''
     
-    # Add new thumbnails (up to 12)
+    # Try a simpler approach - create all thumbnails using a single innerHTML update
+    html_content = ""
+    
     for i, video in enumerate(videos_data[:12]):
-      # Create thumbnail container
-      thumbnail_div = anvil.js.window.document.createElement('div')
-      thumbnail_div.className = 'thumbnail-container'
-      thumbnail_div.setAttribute('data-video-id', video.get('id', ''))
-      thumbnail_div.setAttribute('data-index', str(i))
+      video_id = video.get('id', '')
+      title = video.get('title', 'Untitled video')
+      thumbnail_url = video.get('thumbnail_url', 'https://via.placeholder.com/320x180')
       
-      # Create thumbnail image
-      img = anvil.js.window.document.createElement('img')
-      img.src = video.get('thumbnail_url', 'https://via.placeholder.com/320x180')
-      img.alt = video.get('title', 'Video thumbnail')
-      img.className = 'thumbnail-image'
+      # Create the HTML for this thumbnail
+      html_content += f"""
+      <div class="thumbnail-container" data-video-id="{video_id}" data-index="{i}" onclick="anvil.call('thumbnail_click', {i})">
+        <img src="{thumbnail_url}" alt="{title}" class="thumbnail-image">
+        <p class="video-title">{title}</p>
+      </div>
+      """
+    
+    # Set the HTML content
+    grid_container.innerHTML = html_content
       
-      # Create title element
-      title = anvil.js.window.document.createElement('p')
-      title.className = 'video-title'
-      title.textContent = video.get('title', 'Untitled video')
-      
-      # Add click event
-      thumbnail_div.addEventListener('click', self.create_thumbnail_click_handler(i))
-      
-      # Append elements to container
-      thumbnail_div.appendChild(img)
-      thumbnail_div.appendChild(title)
-      grid_container.appendChild(thumbnail_div)
-      
-  def create_thumbnail_click_handler(self, index):
-    """Create a click handler for a thumbnail at the specified index"""
-    def handler(event):
-      if index < len(self.videos):
-        self.play_video(self.videos[index])
-    return handler
+  def thumbnail_click(self, index):
+    """Handle thumbnail click from HTML"""
+    if index < len(self.videos):
+      self.play_video(self.videos[index])
     
   def play_video(self, video_data):
     """Play the specified video"""
@@ -176,7 +177,7 @@ class ServerTest(ServerTestTemplate):
       return
       
     # Update the iframe src with the new video ID
-    player_container = anvil.js.get_dom_node(self.yt_player_container).querySelector('.youtube-player-container')
+    player_container = anvil.js.get_dom_node(self.player_html).querySelector('.youtube-player-container')
     if player_container:
       player_container.innerHTML = f"""
         <iframe 
@@ -189,7 +190,7 @@ class ServerTest(ServerTestTemplate):
       """
       
     # Update video title if available
-    title_element = anvil.js.get_dom_node(self.yt_player_container).querySelector('.video-title-display')
+    title_element = anvil.js.get_dom_node(self.player_html).querySelector('.video-title-display')
     if title_element and video_data.get('title'):
       title_element.textContent = video_data.get('title')
       
@@ -267,11 +268,18 @@ class ServerTest(ServerTestTemplate):
         }
       ]
     
-    # Update the YouTube grid with videos
-    self.update_youtube_grid(videos)
+    # Create a separate notification showing we're updating thumbnails
+    Notification("Preparing to update thumbnails...", timeout=2).show()
     
-    # Show a notification
-    Notification(f"Found {len(videos)} YouTube videos for '{query}'", timeout=3).show()
+    try:
+      # Update the YouTube grid with videos
+      self.update_youtube_grid(videos)
+      
+      # Show a notification of success
+      Notification(f"Successfully added {len(videos)} videos to grid", timeout=3).show()
+    except Exception as e:
+      # Show error notification if update fails
+      alert(f"Error updating grid: {str(e)}")
     
     # Scroll to see results
     self.yt_grid_container.scroll_into_view()
