@@ -9,6 +9,9 @@ class MinimalApp(MinimalAppTemplate):
     # Set all panels visible
     self.show_all_panels()
     
+    # Add global placeholder image handler
+    self.add_placeholder_image_handler()
+    
     # Initialize video functionality
     self.setup_youtube_functionality()
     
@@ -25,6 +28,109 @@ class MinimalApp(MinimalAppTemplate):
     
     # Add the debug panel to the search panel
     self.search_panel.add_component(self.debug_panel, index=1)
+    
+  def add_placeholder_image_handler(self):
+    """Add a global handler to replace all placeholder.com images with data URIs"""
+    # Create small avatar placeholder (40x40)
+    avatar_placeholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='10' text-anchor='middle' fill='%23666666'%3E?%3C/text%3E%3C/svg%3E"
+    
+    # Create a global script to replace all placeholder images
+    placeholder_script = anvil.js.window.document.createElement('script')
+    placeholder_script.innerHTML = f"""
+    // Function to replace all placeholder images
+    function replaceAllPlaceholderImages() {{
+      // Create a MutationObserver to watch for new images
+      const observer = new MutationObserver(function(mutations) {{
+        mutations.forEach(function(mutation) {{
+          if (mutation.addedNodes) {{
+            mutation.addedNodes.forEach(function(node) {{
+              // Check if the node is an element
+              if (node.nodeType === 1) {{
+                // Find all images in the node
+                const images = node.querySelectorAll ? node.querySelectorAll('img') : [];
+                if (node.tagName === 'IMG') images.push(node);
+                
+                // Process each image
+                images.forEach(function(img) {{
+                  if (img.src && img.src.includes('placeholder.com')) {{
+                    // Get image dimensions from the placeholder URL
+                    const src = img.src;
+                    const match = src.match(/placeholder\\.com\\/(\\d+)x(\\d+)/);
+                    
+                    if (match && match[1] && match[2]) {{
+                      const width = match[1];
+                      const height = match[2];
+                      
+                      // Use dimensions to create appropriate SVG
+                      if (width <= 40 && height <= 40) {{
+                        // Use avatar placeholder for small images
+                        img.src = "{avatar_placeholder}";
+                      }} else {{
+                        // Create a custom sized placeholder
+                        const svgPlaceholder = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${{width}}' height='${{height}}' viewBox='0 0 ${{width}} ${{height}}'%3E%3Crect width='${{width}}' height='${{height}}' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='${{Math.max(12, Math.min(24, width/10))}}' text-anchor='middle' fill='%23666666'%3E${{width}}x${{height}}%3C/text%3E%3C/svg%3E`;
+                        img.src = svgPlaceholder;
+                      }}
+                    }} else {{
+                      // Default placeholder if dimensions can't be determined
+                      img.src = "{avatar_placeholder}";
+                    }}
+                    
+                    // Add error handler in case this fails
+                    img.onerror = function() {{
+                      this.onerror = null;
+                      this.src = "{avatar_placeholder}";
+                    }};
+                  }}
+                }});
+              }}
+            }});
+          }}
+        }});
+      }});
+      
+      // Start observing the document with the configured parameters
+      observer.observe(document.body, {{ childList: true, subtree: true }});
+      
+      // Also process existing images
+      document.querySelectorAll('img').forEach(function(img) {{
+        if (img.src && img.src.includes('placeholder.com')) {{
+          // Same logic as above
+          const src = img.src;
+          const match = src.match(/placeholder\\.com\\/(\\d+)x(\\d+)/);
+          
+          if (match && match[1] && match[2]) {{
+            const width = match[1];
+            const height = match[2];
+            
+            if (width <= 40 && height <= 40) {{
+              img.src = "{avatar_placeholder}";
+            }} else {{
+              const svgPlaceholder = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${{width}}' height='${{height}}' viewBox='0 0 ${{width}} ${{height}}'%3E%3Crect width='${{width}}' height='${{height}}' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='${{Math.max(12, Math.min(24, width/10))}}' text-anchor='middle' fill='%23666666'%3E${{width}}x${{height}}%3C/text%3E%3C/svg%3E`;
+              img.src = svgPlaceholder;
+            }}
+          }} else {{
+            img.src = "{avatar_placeholder}";
+          }}
+          
+          img.onerror = function() {{
+            this.onerror = null;
+            this.src = "{avatar_placeholder}";
+          }};
+        }}
+      }});
+    }}
+    
+    // Run immediately and after page load
+    replaceAllPlaceholderImages();
+    if (document.readyState === 'complete') {{
+      replaceAllPlaceholderImages();
+    }} else {{
+      window.addEventListener('load', replaceAllPlaceholderImages);
+    }}
+    """
+    
+    # Add the script to the document head
+    anvil.js.window.document.head.appendChild(placeholder_script)
     
   def create_test_grid(self, **event_args):
     """Create a test grid with simple colored boxes"""
@@ -256,7 +362,7 @@ class MinimalApp(MinimalAppTemplate):
     # Add the event listener to the document
     anvil.js.window.document.addEventListener('thumbnail-click', self._thumbnail_handler)
     
-  def thumbnail_click(self, **event_args):
+  def thumbnail_click(self, *args, **event_args):
     """Handle thumbnail click from HTML"""
     index = event_args.get('index', 0)
     alert(f"Thumbnail clicked: {index}")
