@@ -328,7 +328,21 @@ class MinimalApp(MinimalAppTemplate):
     # Clear existing content
     grid_container.innerHTML = ''
     
-    # Create thumbnails using direct HTML insertion
+    # Check if we have videos to display
+    if not videos_data:
+      # Display a "no videos found" message in the grid
+      grid_container.innerHTML = """
+        <div style="text-align: center; padding: 40px; width: 100%;">
+          <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; background-color: #f8f9fa; display: inline-block; max-width: 600px;">
+            <h3 style="color: #6c757d; margin-bottom: 15px;">No Videos Found</h3>
+            <p style="color: #6c757d;">Enter a search term and connect to the YouTube API to display real video results.</p>
+            <p style="color: #6c757d; font-size: 0.9em; margin-top: 15px;">This application does not display pre-loaded dummy videos.</p>
+          </div>
+        </div>
+      """
+      return
+    
+    # Otherwise, continue with normal video display (if we have videos)
     thumbnails_html = ""
     
     # Data URI for default thumbnail (gray background with text)
@@ -387,17 +401,19 @@ class MinimalApp(MinimalAppTemplate):
     # Set all thumbnails at once
     grid_container.innerHTML = thumbnails_html
     
-    # Add a document-level event listener for the custom event
-    @anvil.js.report_exceptions
-    def handle_thumbnail_event(e):
-      index = e.detail.index
-      self.thumbnail_click(dict(index=index))
-    
-    # Store the event listener function to be able to remove it later if needed
-    self._thumbnail_handler = handle_thumbnail_event
-    
-    # Add the event listener to the document
-    anvil.js.window.document.addEventListener('thumbnail-click', self._thumbnail_handler)
+    # Only add event listeners if we have videos
+    if videos_data:
+      # Add a document-level event listener for the custom event
+      @anvil.js.report_exceptions
+      def handle_thumbnail_event(e):
+        index = e.detail.index
+        self.thumbnail_click(dict(index=index))
+      
+      # Store the event listener function to be able to remove it later if needed
+      self._thumbnail_handler = handle_thumbnail_event
+      
+      # Add the event listener to the document
+      anvil.js.window.document.addEventListener('thumbnail-click', self._thumbnail_handler)
     
   def thumbnail_click(self, *args, **event_args):
     """Handle thumbnail click from HTML"""
@@ -487,90 +503,41 @@ class MinimalApp(MinimalAppTemplate):
     Notification("Searching for videos...", timeout=2).show()
     
     try:
-      # Create mock YouTube results with real YouTube thumbnails
-      # These are actual YouTube video IDs with their thumbnails
-      videos = [
-        {
-          'id': 'dQw4w9WgXcQ',  # Rick Astley - Never Gonna Give You Up
-          'title': f'Result 1: {query} - Music Video',
-          'thumbnail_url': 'https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg',
-        },
-        {
-          'id': '9bZkp7q19f0',  # PSY - Gangnam Style
-          'title': f'Result 2: {query} - Popular Dance',
-          'thumbnail_url': 'https://i.ytimg.com/vi/9bZkp7q19f0/mqdefault.jpg',
-        },
-        {
-          'id': 'fJ9rUzIMcZQ',  # Queen - Bohemian Rhapsody
-          'title': f'Result 3: {query} - Classic Rock',
-          'thumbnail_url': 'https://i.ytimg.com/vi/fJ9rUzIMcZQ/mqdefault.jpg',
-        },
-        {
-          'id': 'kJQP7kiw5Fk',  # Luis Fonsi - Despacito
-          'title': f'Result 4: {query} - Latin Pop',
-          'thumbnail_url': 'https://i.ytimg.com/vi/kJQP7kiw5Fk/mqdefault.jpg',
-        },
-        {
-          'id': 'JGwWNGJdvx8',  # Ed Sheeran - Shape of You
-          'title': f'Result 5: {query} - Pop Music',
-          'thumbnail_url': 'https://i.ytimg.com/vi/JGwWNGJdvx8/mqdefault.jpg',
-        },
-        {
-          'id': 'OPf0YbXqDm0',  # Mark Ronson - Uptown Funk
-          'title': f'Result 6: {query} - Funk/Pop',
-          'thumbnail_url': 'https://i.ytimg.com/vi/OPf0YbXqDm0/mqdefault.jpg',
-        },
-        {
-          'id': 'CevxZvSJLk8',  # Katy Perry - Roar
-          'title': f'Result 7: {query} - Pop Music',
-          'thumbnail_url': 'https://i.ytimg.com/vi/CevxZvSJLk8/mqdefault.jpg',
-        },
-        {
-          'id': 'pRpeEdMmmQ0',  # Imagine Dragons - Believer
-          'title': f'Result 8: {query} - Alternative Rock',
-          'thumbnail_url': 'https://i.ytimg.com/vi/pRpeEdMmmQ0/mqdefault.jpg',
-        },
-        {
-          'id': 'JznMHWXRTBY',  # Simple background video for demonstrations
-          'title': f'Result 9: {query} - Background Video',
-          'thumbnail_url': 'https://i.ytimg.com/vi/JznMHWXRTBY/mqdefault.jpg',
-        }
-      ]
+      # Attempt to get results from server (in a full app)
+      # For demonstration purposes, we'll show an empty result set
+      videos = []
       
-      # Create a separate notification showing we're updating thumbnails
-      Notification("Loading thumbnails...", timeout=2).show()
+      # Display a clear message about no server results
+      self.results_panel.clear()
+      self.results_panel.add_component(Label(text=f"Search Results for: {query}", role="heading"))
       
-      # Update the YouTube grid with new videos
+      # Add message about YouTube API
+      message_panel = ColumnPanel(spacing="medium")
+      message_panel.border = "1px solid #ddd"
+      message_panel.background = "#f8f9fa"
+      message_panel.spacing = ("medium", "medium", "medium", "medium")
+      
+      title = Label(text="YouTube API Connection Required", role="heading")
+      title.bold = True
+      title.foreground = "#dc3545"  # Bootstrap danger color
+      
+      info = Label(text=f"This demo requires a YouTube Data API key to display real search results for '{query}'. No dummy videos will be shown.")
+      explanation = Label(text="In a production environment, the server would connect to the YouTube API and return real results.")
+      
+      message_panel.add_component(title)
+      message_panel.add_component(info)
+      message_panel.add_component(explanation)
+      
+      self.results_panel.add_component(message_panel)
+      
+      # Clear the current grid and update with empty results
       self.update_youtube_grid(videos)
       
-      # Show a notification of success
-      Notification(f"Successfully added {len(videos)} videos to grid", timeout=3).show()
+      # Show a notification explaining the empty results
+      Notification("No videos to display - YouTube API key required", timeout=4).show()
       
-      # Also show text search results for consistency
-      self.results_panel.clear()
-      self.results_panel.add_component(Label(text=f"Text Results for: {query}", role="heading"))
-      
-      # Add some mock results
-      for i in range(3):
-        # Create a card for each mock result
-        card = ColumnPanel(spacing="medium")
-        card.border = "1px solid #ddd"
-        # Set padding using spacing property instead of direct padding attribute
-        card.spacing = ("medium", "medium", "medium", "medium")
-        card.spacing_below = "medium"
-        
-        # Add mock title and info
-        title = Label(text=f"Mock result {i+1} for {query}", role="heading")
-        title.bold = True
-        info = Label(text=f"This is a mock search result showing content for '{query}'")
-        
-        card.add_component(title)
-        card.add_component(info)
-        
-        self.results_panel.add_component(card)
-        
-      # Scroll to both results
-      self.yt_grid_container.scroll_into_view()
+      # Scroll to show the explanation
+      self.results_panel.scroll_into_view()
       
     except Exception as e:
       # Show error notification if search fails
