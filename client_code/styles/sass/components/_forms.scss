@@ -1,0 +1,147 @@
+// Form Styles
+
+// Form group
+.form-group {
+  margin-bottom: $spacing-medium;
+}
+
+// Form label
+.form-label {
+  display: block;
+  margin-bottom: $spacing-small;
+  font-weight: $font-weight-bold;
+}
+
+// Form control (input, select, textarea)
+.form-control {
+  display: block;
+  width: 100%;
+  padding: $spacing-small $spacing-medium;
+  font-size: $font-size-base;
+  font-family: $font-family-base;
+  line-height: $line-height-base;
+  color: $text-color;
+  background-color: $background-color;
+  border: $border-width solid $border-color;
+  border-radius: $border-radius-medium;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+  }
+  
+  &:disabled,
+  &[readonly] {
+    background-color: $background-color-light;
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  &.is-invalid {
+    border-color: $danger-color;
+    
+    &:focus {
+      box-shadow: 0 0 0 3px rgba($danger-color, 0.2);
+    }
+  }
+}
+
+// Select control
+select.form-control {
+  appearance: none;
+  padding-right: $spacing-xlarge;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='4' viewBox='0 0 8 4'%3E%3Cpath fill='%23333' d='M0 0l4 4 4-4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right $spacing-medium center;
+  background-size: 8px 4px;
+}
+
+// Textarea
+textarea.form-control {
+  resize: vertical;
+  min-height: 100px;
+}
+
+// Custom checkbox and radio
+.form-check {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-small;
+  cursor: pointer;
+  
+  input {
+    margin-right: $spacing-small;
+  }
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Form validation message
+.invalid-feedback {
+  display: block;
+  width: 100%;
+  margin-top: $spacing-xs;
+  font-size: $font-size-small;
+  color: $danger-color;
+}
+
+// Form help text
+.form-text {
+  display: block;
+  margin-top: $spacing-xs;
+  font-size: $font-size-small;
+  color: $text-color-light;
+}
+
+// Form row (for horizontal layouts)
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -$spacing-small;
+  margin-left: -$spacing-small;
+  
+  > .form-group {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding-right: $spacing-small;
+    padding-left: $spacing-small;
+    
+    @include mobile {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+}
+
+// Range input
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 5px;
+  background: $border-color;
+  outline: none;
+  
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: $primary-color;
+    cursor: pointer;
+  }
+  
+  &::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: $primary-color;
+    cursor: pointer;
+    border: none;
+  }
+} 

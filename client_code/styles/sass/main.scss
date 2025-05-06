@@ -1,0 +1,73 @@
+// Import variables and mixins
+@import 'variables';
+@import 'mixins';
+
+// Import component styles
+@import 'components/todo';
+@import 'components/video-processor';
+@import 'components/buttons';
+@import 'components/forms';
+@import 'components/layout';
+
+// Global styles
+body {
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  line-height: $line-height-base;
+  color: $text-color;
+  background-color: $background-color;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: $spacing-medium;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+}
+
+h1 { font-size: $font-size-xxlarge; }
+h2 { font-size: $font-size-xlarge; }
+h3 { font-size: $font-size-large; }
+
+p {
+  margin-top: 0;
+  margin-bottom: $spacing-medium;
+}
+
+a {
+  color: $secondary-color;
+  text-decoration: none;
+  
+  &:hover {
+    color: $secondary-color-dark;
+    text-decoration: underline;
+  }
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+// Utility classes
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+
+.mb-1 { margin-bottom: $spacing-small; }
+.mb-2 { margin-bottom: $spacing-medium; }
+.mb-3 { margin-bottom: $spacing-large; }
+
+.mt-1 { margin-top: $spacing-small; }
+.mt-2 { margin-top: $spacing-medium; }
+.mt-3 { margin-top: $spacing-large; }
+
+.p-1 { padding: $spacing-small; }
+.p-2 { padding: $spacing-medium; }
+.p-3 { padding: $spacing-large; }
+
+.container {
+  @include container;
+} 

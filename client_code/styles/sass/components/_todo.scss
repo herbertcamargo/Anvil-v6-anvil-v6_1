@@ -1,0 +1,86 @@
+// Todo component styles
+.todo-container {
+  @include container;
+  padding: $spacing-medium;
+  font-family: $font-family-base;
+  
+  h2 {
+    margin-bottom: $spacing-large;
+    color: $primary-color;
+  }
+}
+
+.input-container {
+  display: flex;
+  margin-bottom: $spacing-medium;
+  
+  input {
+    flex-grow: 1;
+    padding: $spacing-small $spacing-medium;
+    font-size: $font-size-base;
+    border: $border-width solid $border-color;
+    border-radius: $border-radius-medium 0 0 $border-radius-medium;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+    }
+  }
+  
+  button {
+    @include button-primary;
+    border-radius: 0 $border-radius-medium $border-radius-medium 0;
+  }
+}
+
+.todo-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-small $spacing-medium;
+    border-bottom: $border-width solid $border-color;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    &.completed span {
+      text-decoration: line-through;
+      color: $text-color-light;
+    }
+    
+    span {
+      cursor: pointer;
+      flex-grow: 1;
+      padding: $spacing-small 0;
+      
+      &:hover {
+        color: $primary-color;
+      }
+    }
+    
+    button {
+      @include button-danger;
+      padding: $spacing-xs $spacing-small;
+      font-size: $font-size-small;
+    }
+  }
+}
+
+// Vue specific styles
+.vue-todo-container {
+  .todo-list {
+    li {
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: $background-color-light;
+      }
+    }
+  }
+} 

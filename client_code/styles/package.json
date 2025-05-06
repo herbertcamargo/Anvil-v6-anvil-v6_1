@@ -1,0 +1,15 @@
+{
+  "name": "anvil-styles",
+  "version": "1.0.0",
+  "description": "SASS styling for Anvil application",
+  "scripts": {
+    "build": "sass --no-source-map sass:css",
+    "watch": "sass --no-source-map --watch sass:css",
+    "copy": "node scripts/copy-to-theme.js",
+    "build-and-copy": "npm run build && npm run copy"
+  },
+  "devDependencies": {
+    "sass": "^1.66.1",
+    "fs-extra": "^11.1.1"
+  }
+} 

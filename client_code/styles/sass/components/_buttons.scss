@@ -1,0 +1,66 @@
+// Button Styles
+
+// Primary button
+.btn-primary {
+  @include button-primary;
+}
+
+// Secondary button
+.btn-secondary {
+  @include button-secondary;
+}
+
+// Danger button
+.btn-danger {
+  @include button-danger;
+}
+
+// Outline button
+.btn-outline {
+  @include button-base;
+  background-color: transparent;
+  border: $border-width solid $primary-color;
+  color: $primary-color;
+  
+  &:hover, &:focus {
+    background-color: $primary-color;
+    color: white;
+  }
+  
+  &:disabled {
+    border-color: $text-color-light;
+    color: $text-color-light;
+    cursor: not-allowed;
+  }
+}
+
+// Button sizes
+.btn-small {
+  padding: $spacing-xs $spacing-small;
+  font-size: $font-size-small;
+}
+
+.btn-large {
+  padding: $spacing-medium $spacing-large;
+  font-size: $font-size-large;
+}
+
+// Button group
+.btn-group {
+  display: flex;
+  
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  .btn-outline {
+    border-radius: 0;
+    
+    &:first-child {
+      border-radius: $border-radius-medium 0 0 $border-radius-medium;
+    }
+    
+    &:last-child {
+      border-radius: 0 $border-radius-medium $border-radius-medium 0;
+    }
+  }
+} 

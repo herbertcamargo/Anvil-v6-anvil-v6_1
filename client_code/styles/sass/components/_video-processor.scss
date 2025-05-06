@@ -1,0 +1,138 @@
+// Video Processor Component Styles
+.video-processor {
+  @include container;
+  padding: $spacing-medium;
+  font-family: $font-family-base;
+  
+  h2 {
+    margin-bottom: $spacing-large;
+    color: $primary-color;
+    text-align: center;
+    
+    // Vue version has a slightly different color
+    .video-processor.vue & {
+      color: $secondary-color;
+    }
+  }
+  
+  h3 {
+    margin-bottom: $spacing-medium;
+    text-align: center;
+  }
+}
+
+// Controls section
+.controls {
+  margin-bottom: $spacing-large;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-medium;
+  align-items: center;
+  
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.file-input {
+  flex: 1;
+  min-width: 200px;
+  
+  @include mobile {
+    width: 100%;
+  }
+}
+
+.play-button {
+  @include button-primary;
+  
+  .video-processor.vue & {
+    @include button-secondary;
+  }
+  
+  &:disabled {
+    background-color: $text-color-light;
+    cursor: not-allowed;
+  }
+}
+
+.effect-selector, .param-slider {
+  display: flex;
+  align-items: center;
+  gap: $spacing-small;
+  
+  label {
+    margin-right: $spacing-small;
+    white-space: nowrap;
+  }
+  
+  select {
+    padding: $spacing-small;
+    border: $border-width solid $border-color;
+    border-radius: $border-radius-medium;
+    background-color: $background-color;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      
+      .video-processor.vue & {
+        border-color: $secondary-color;
+      }
+    }
+  }
+  
+  input[type="range"] {
+    flex-grow: 1;
+    
+    // Custom range styling could be added here
+  }
+}
+
+// Video container section
+.video-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-large;
+  margin-bottom: $spacing-large;
+  
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+.video-wrapper, .canvas-wrapper {
+  flex: 1;
+  min-width: 300px;
+  
+  @include card;
+  
+  @include mobile {
+    width: 100%;
+  }
+}
+
+video, canvas {
+  width: 100%;
+  background-color: #000;
+  border: $border-width solid $border-color;
+  border-radius: $border-radius-small;
+  display: block;
+  
+  &:not([style*="display: block"]) {
+    display: none;
+  }
+}
+
+// Loading indicator
+.loading {
+  margin-top: $spacing-medium;
+  padding: $spacing-medium;
+  background-color: $background-color-light;
+  border: $border-width solid $border-color;
+  border-radius: $border-radius-medium;
+  text-align: center;
+  
+  @include box-shadow-light;
+} 

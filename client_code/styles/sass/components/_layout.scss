@@ -1,0 +1,140 @@
+// Layout Styles
+
+// Main container
+.container {
+  @include container;
+}
+
+// Container with fixed width
+.container-fixed {
+  width: 100%;
+  max-width: $container-max-width;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: $spacing-medium;
+  padding-right: $spacing-medium;
+}
+
+// Container with fluid width
+.container-fluid {
+  width: 100%;
+  padding-left: $spacing-medium;
+  padding-right: $spacing-medium;
+}
+
+// Row
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -$spacing-medium;
+  margin-left: -$spacing-medium;
+}
+
+// Columns
+.col {
+  flex-basis: 0;
+  flex-grow: 1;
+  max-width: 100%;
+  padding-right: $spacing-medium;
+  padding-left: $spacing-medium;
+}
+
+@for $i from 1 through 12 {
+  .col-#{$i} {
+    flex: 0 0 calc(#{$i} / 12 * 100%);
+    max-width: calc(#{$i} / 12 * 100%);
+    padding-right: $spacing-medium;
+    padding-left: $spacing-medium;
+  }
+  
+  // Responsive columns
+  .col-sm-#{$i} {
+    @include mobile {
+      flex: 0 0 calc(#{$i} / 12 * 100%);
+      max-width: calc(#{$i} / 12 * 100%);
+    }
+  }
+  
+  .col-md-#{$i} {
+    @include tablet {
+      flex: 0 0 calc(#{$i} / 12 * 100%);
+      max-width: calc(#{$i} / 12 * 100%);
+    }
+  }
+  
+  .col-lg-#{$i} {
+    @include desktop {
+      flex: 0 0 calc(#{$i} / 12 * 100%);
+      max-width: calc(#{$i} / 12 * 100%);
+    }
+  }
+}
+
+// Cards
+.card {
+  @include card;
+  
+  .card-header {
+    padding: $spacing-medium;
+    margin: (-$spacing-medium) (-$spacing-medium) 0;
+    background-color: $background-color-light;
+    border-bottom: $border-width solid $border-color;
+    border-radius: $border-radius-medium $border-radius-medium 0 0;
+  }
+  
+  .card-body {
+    padding: $spacing-medium;
+  }
+  
+  .card-footer {
+    padding: $spacing-medium;
+    margin: 0 (-$spacing-medium) (-$spacing-medium);
+    background-color: $background-color-light;
+    border-top: $border-width solid $border-color;
+    border-radius: 0 0 $border-radius-medium $border-radius-medium;
+  }
+}
+
+// Section
+.section {
+  padding: $spacing-xlarge 0;
+  
+  &-sm {
+    padding: $spacing-medium 0;
+  }
+  
+  &-lg {
+    padding: $spacing-xlarge * 2 0;
+  }
+}
+
+// Divider
+.divider {
+  width: 100%;
+  height: $border-width;
+  background-color: $border-color;
+  margin: $spacing-large 0;
+}
+
+// Vertical spacing
+.spacer {
+  &-xs {
+    height: $spacing-xs;
+  }
+  
+  &-sm {
+    height: $spacing-small;
+  }
+  
+  &-md {
+    height: $spacing-medium;
+  }
+  
+  &-lg {
+    height: $spacing-large;
+  }
+  
+  &-xl {
+    height: $spacing-xlarge;
+  }
+} 

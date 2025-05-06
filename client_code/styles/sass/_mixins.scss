@@ -1,0 +1,149 @@
+// Flexbox mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Responsive mixins
+@mixin mobile {
+  @media (max-width: #{$breakpoint-small - 1px}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: #{$breakpoint-small}) and (max-width: #{$breakpoint-large - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: #{$breakpoint-large}) {
+    @content;
+  }
+}
+
+// Box shadow mixins
+@mixin box-shadow-light {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+@mixin box-shadow-medium {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+@mixin box-shadow-heavy {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+// Button mixins
+@mixin button-base {
+  display: inline-block;
+  padding: $spacing-small $spacing-medium;
+  border: none;
+  border-radius: $border-radius-medium;
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: $font-weight-bold;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+}
+
+@mixin button-primary {
+  @include button-base;
+  background-color: $primary-color;
+  color: white;
+  
+  &:hover, &:focus {
+    background-color: $primary-color-dark;
+  }
+  
+  &:disabled {
+    background-color: lighten($primary-color, 30%);
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+  background-color: $secondary-color;
+  color: white;
+  
+  &:hover, &:focus {
+    background-color: $secondary-color-dark;
+  }
+  
+  &:disabled {
+    background-color: lighten($secondary-color, 30%);
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-danger {
+  @include button-base;
+  background-color: $danger-color;
+  color: white;
+  
+  &:hover, &:focus {
+    background-color: darken($danger-color, 10%);
+  }
+  
+  &:disabled {
+    background-color: lighten($danger-color, 30%);
+    cursor: not-allowed;
+  }
+}
+
+// Text truncation
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Card mixin
+@mixin card {
+  background-color: $background-color;
+  border-radius: $border-radius-medium;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: $spacing-medium;
+  margin-bottom: $spacing-medium;
+}
+
+// Container mixin
+@mixin container {
+  width: 100%;
+  max-width: $container-max-width;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: $spacing-medium;
+  padding-right: $spacing-medium;
+}
+
+// Transition mixin
+@mixin transition($property: all, $duration: 0.3s, $timing: ease) {
+  transition: $property $duration $timing;
+}
+
+// Clearfix mixin
+@mixin clearfix {
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+} 

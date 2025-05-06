@@ -1,0 +1,63 @@
+// Colors
+$primary-color: #4CAF50;
+$primary-color-dark: darken($primary-color, 10%);
+$primary-color-light: lighten($primary-color, 10%);
+
+$secondary-color: #2196F3;
+$secondary-color-dark: darken($secondary-color, 10%);
+$secondary-color-light: lighten($secondary-color, 10%);
+
+$danger-color: #f44336;
+$warning-color: #ff9800;
+$info-color: #03a9f4;
+$success-color: #4caf50;
+
+$text-color: #333333;
+$text-color-light: #757575;
+$border-color: #dddddd;
+$background-color: #ffffff;
+$background-color-light: #f8f9fa;
+
+// Typography
+$font-family-base: Arial, sans-serif;
+$font-size-base: 16px;
+$font-size-small: 14px;
+$font-size-large: 18px;
+$font-size-xlarge: 24px;
+$font-size-xxlarge: 32px;
+
+$line-height-base: 1.5;
+$font-weight-normal: 400;
+$font-weight-bold: 700;
+
+// Spacing
+$spacing-xs: 4px;
+$spacing-small: 8px;
+$spacing-medium: 16px;
+$spacing-large: 24px;
+$spacing-xlarge: 32px;
+
+// Borders
+$border-radius-small: 2px;
+$border-radius-medium: 4px;
+$border-radius-large: 8px;
+$border-width: 1px;
+
+// Breakpoints
+$breakpoint-xs: 480px;
+$breakpoint-small: 576px;
+$breakpoint-medium: 768px;
+$breakpoint-large: 992px;
+$breakpoint-xlarge: 1200px;
+
+// Container
+$container-max-width: 900px;
+
+// Z-index values
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070; 
