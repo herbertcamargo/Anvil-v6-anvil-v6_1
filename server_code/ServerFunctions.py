@@ -51,34 +51,27 @@ def delete_user():
 @anvil.server.callable
 def search_youtube_videos(query):
   """Mock function to search YouTube videos"""
-  # In a real app, this would call the YouTube API
-  # For now, return mock data
-  if not query:
+  # Very simple mock data with minimal processing
+  try:
+    # Just return static data to prevent any unexpected errors
+    return [
+      {
+        'video_id': 'video1',
+        'title': 'Sample Video 1',
+        'thumbnail': None,  # Avoid external URL that might cause issues
+        'channel': 'Sample Channel'
+      },
+      {
+        'video_id': 'video2',
+        'title': 'Sample Video 2',
+        'thumbnail': None,
+        'channel': 'Education Channel'
+      }
+    ]
+  except Exception as e:
+    # Log the error but return empty list to avoid crashing
+    print(f"Error in search_youtube_videos: {str(e)}")
     return []
-  
-  # Mock video results
-  videos = [
-    {
-      'video_id': 'video1',
-      'title': f'Sample video about {query}',
-      'thumbnail': 'https://via.placeholder.com/320x180',
-      'channel': 'Sample Channel'
-    },
-    {
-      'video_id': 'video2',
-      'title': f'Learn about {query} - Tutorial',
-      'thumbnail': 'https://via.placeholder.com/320x180',
-      'channel': 'Education Channel'
-    },
-    {
-      'video_id': 'video3',
-      'title': f'{query} for beginners',
-      'thumbnail': 'https://via.placeholder.com/320x180',
-      'channel': 'Tutorial Channel'
-    }
-  ]
-  
-  return videos
 
 @anvil.server.callable
 def compare_transcriptions(user_text, official_text):

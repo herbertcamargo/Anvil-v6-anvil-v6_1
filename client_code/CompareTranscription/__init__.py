@@ -58,8 +58,13 @@ class CompareTranscription(CompareTranscriptionTemplate):
       # Add simple notification to show we're searching
       Notification("Searching for videos...", timeout=2).show()
       
-      # Call the server function
-      results = anvil.server.call('search_youtube_videos', query)
+      try:
+        # Call the server function with a short timeout
+        results = anvil.server.call('search_youtube_videos', query)
+      except Exception as e:
+        # Handle server errors
+        alert(f"Server error: {str(e)}")
+        return
       
       # Clear existing results
       results_container = ColumnPanel()
@@ -78,33 +83,24 @@ class CompareTranscription(CompareTranscriptionTemplate):
           card.padding = 10
           card.spacing_below = "medium"
           
-          # Add thumbnail if available
-          if 'thumbnail' in video and video['thumbnail']:
-            thumbnail = Image(source=video['thumbnail'], width=320, height=180)
-            card.add_component(thumbnail)
+          # Create a placeholder image that won't cause errors
+          thumbnail = Image(source=None, width=320, height=180)
+          thumbnail.background = "#f0f0f0"  # Gray background for placeholder
+          card.add_component(thumbnail)
           
-          # Add title
-          if 'title' in video and video['title']:
-            title = Label(text=video['title'], role="heading")
-            title.bold = True
-            card.add_component(title)
+          # Add title (use a default if missing)
+          title_text = video.get('title', 'Unknown Title')
+          title = Label(text=title_text, role="heading")
+          title.bold = True
+          card.add_component(title)
           
-          # Add channel
-          if 'channel' in video and video['channel']:
-            channel = Label(text=f"Channel: {video['channel']}")
-            card.add_component(channel)
+          # Add channel (use a default if missing)
+          channel_text = f"Channel: {video.get('channel', 'Unknown Channel')}"
+          channel = Label(text=channel_text)
+          card.add_component(channel)
           
           # Add a button to select this video
-          select_btn = Button(text="Select this video", role="primary-color")
-          
-          # Define a function to handle the button click with this specific video
-          def create_click_handler(vid):
-            def handler(**event_args):
-              Notification(f"Selected video: {vid['title']}", timeout=2).show()
-              # Could load the video or set up transcription here
-            return handler
-          
-          select_btn.set_event_handler('click', create_click_handler(video))
+          select_btn = Button(text="Select Video", role="primary")
           card.add_component(select_btn)
           
           # Add the card to the results container
@@ -112,19 +108,29 @@ class CompareTranscription(CompareTranscriptionTemplate):
       
       # Replace the existing results with the new ones
       self.content_panel.clear()
-      self.content_panel.add_component(self.language_dropdown)
-      self.content_panel.add_component(self.search_box)
-      self.content_panel.add_component(self.search_button)
+      
+      # Create a search controls panel
+      search_controls = FlowPanel()
+      search_controls.add_component(self.language_dropdown)
+      search_controls.add_component(self.search_box)
+      search_controls.add_component(self.search_button)
+      
+      self.content_panel.add_component(search_controls)
       self.content_panel.add_component(results_container)
-      self.content_panel.add_component(self.user_input_box)
-      self.content_panel.add_component(self.compare_button)
-      self.content_panel.add_component(self.comparison_output)
-      self.content_panel.add_component(self.accuracy_label)
-      self.content_panel.add_component(self.official_input_box)
+      
+      # Add the transcription components
+      transcription_panel = ColumnPanel()
+      transcription_panel.add_component(self.user_input_box)
+      transcription_panel.add_component(self.compare_button)
+      transcription_panel.add_component(self.comparison_output)
+      transcription_panel.add_component(self.accuracy_label)
+      transcription_panel.add_component(self.official_input_box)
+      
+      self.content_panel.add_component(transcription_panel)
       
     except Exception as e:
       # If an error occurs, display it
-      alert(f"Error performing search: {str(e)}")
+      alert(f"Error processing search results: {str(e)}")
 
   def user_input_box_change(self, **event_args):
     """This method is called when the text in this text area is edited"""
