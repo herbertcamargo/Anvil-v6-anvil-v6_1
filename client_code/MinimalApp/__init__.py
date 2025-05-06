@@ -9,6 +9,9 @@ class MinimalApp(MinimalAppTemplate):
     # Set all panels visible
     self.show_all_panels()
     
+    # Enable global exception reporting for all JavaScript callbacks
+    anvil.js.report_all_exceptions(True)
+    
     # Add global placeholder image handler
     self.add_placeholder_image_handler()
     
@@ -339,12 +342,36 @@ class MinimalApp(MinimalAppTemplate):
       """
     
     # First, inject the click handler function into the page
+    # Use a separate module-like IIFE (Immediately Invoked Function Expression) for better scoping
     click_handler_script = anvil.js.window.document.createElement('script')
     click_handler_script.innerHTML = """
-      function handleThumbnailClick(index) {
-        var event = new CustomEvent('thumbnail-click', { detail: { index: index } });
-        document.dispatchEvent(event);
-      }
+      (function() {
+        // Create a proper module-like scope for YouTube thumbnail handlers
+        window.handleThumbnailClick = function(index) {
+          var event = new CustomEvent('thumbnail-click', { 
+            detail: { index: index },
+            bubbles: true, 
+            cancelable: true 
+          });
+          document.dispatchEvent(event);
+        };
+        
+        // Export video player functionality to global scope
+        window.YouTubePlayer = {
+          loadVideo: function(videoId, title) {
+            // This method could be called directly from JavaScript if needed
+            return new Promise(function(resolve, reject) {
+              try {
+                // Implementation could be expanded later
+                console.log("Loading video: " + videoId + " - " + title);
+                resolve({videoId: videoId, title: title});
+              } catch (error) {
+                reject(error);
+              }
+            });
+          }
+        };
+      })();
     """
     anvil.js.window.document.head.appendChild(click_handler_script)
     
@@ -352,6 +379,7 @@ class MinimalApp(MinimalAppTemplate):
     grid_container.innerHTML = thumbnails_html
     
     # Add a document-level event listener for the custom event
+    @anvil.js.report_exceptions
     def handle_thumbnail_event(e):
       index = e.detail.index
       self.thumbnail_click(dict(index=index))
@@ -375,26 +403,40 @@ class MinimalApp(MinimalAppTemplate):
     if not video_id:
       return
       
-    # Update the iframe src with the new video ID
-    player_container = anvil.js.get_dom_node(self.player_html).querySelector('.youtube-player-container')
-    if player_container:
-      player_container.innerHTML = f"""
-        <iframe 
-          src="https://www.youtube.com/embed/{video_id}?autoplay=1" 
-          frameborder="0" 
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-          allowfullscreen
-          class="youtube-iframe">
-        </iframe>
-      """
+    title = video_data.get('title', 'Untitled video')
       
-    # Update video title if available
-    title_element = anvil.js.get_dom_node(self.player_html).querySelector('.video-title-display')
-    if title_element and video_data.get('title'):
-      title_element.textContent = video_data.get('title')
+    try:
+      # Call our JavaScript player function and await the promise
+      result = anvil.js.await_promise(
+        anvil.js.window.YouTubePlayer.loadVideo(video_id, title)
+      )
       
-    # Scroll to player
-    self.yt_player_container.scroll_into_view()
+      # Now update the iframe src with the new video ID
+      player_container = anvil.js.get_dom_node(self.player_html).querySelector('.youtube-player-container')
+      if player_container:
+        player_container.innerHTML = f"""
+          <iframe 
+            src="https://www.youtube.com/embed/{video_id}?autoplay=1" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen
+            class="youtube-iframe">
+          </iframe>
+        """
+        
+      # Update video title if available
+      title_element = anvil.js.get_dom_node(self.player_html).querySelector('.video-title-display')
+      if title_element and title:
+        title_element.textContent = title
+        
+      # Scroll to player
+      self.yt_player_container.scroll_into_view()
+      
+    except anvil.js.ExternalError as js_error:
+      # Handle JavaScript errors properly
+      error_message = str(js_error.original_error) if hasattr(js_error, 'original_error') else str(js_error)
+      alert(f"Error loading video: {error_message}")
+      print(f"JavaScript error: {error_message}")
     
   def show_all_panels(self):
     """Show all panels"""
