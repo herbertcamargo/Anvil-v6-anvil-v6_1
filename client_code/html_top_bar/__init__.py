@@ -4,6 +4,9 @@ import anvil.server
 import anvil.users
 import anvil.js
 
+# Register this as a Custom Component
+if not hasattr(anvil, 'html_top_bar'):
+  anvil.html_top_bar = html_top_barTemplate
 
 class html_top_bar(html_top_barTemplate):
   def __init__(self, **properties):
