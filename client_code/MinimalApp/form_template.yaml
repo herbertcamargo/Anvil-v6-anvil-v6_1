@@ -1,134 +1,134 @@
-container:
-  type: ColumnPanel
-  properties: {col_widths: '{}'}
 components:
-- type: FlowPanel
-  properties: {role: default, background: primary, spacing: large, align: center}
-  name: nav_bar
-  layout_properties: {grid_position: 'AAAAAA,BBBBBB'}
-  components:
-  - type: Label
-    properties: {text: Transcription App, role: title, foreground: white, bold: true, font_size: 20}
+- components:
+  - layout_properties: {}
     name: app_logo
-    layout_properties: {}
-  - type: Spacer
-    properties: {height: 0, width: 20}
+    properties: {bold: true, font_size: 20, foreground: white, role: title, text: Transcription App}
+    type: Label
+  - layout_properties: {}
     name: spacer_1
+    properties: {height: 0, width: 20}
+    type: Spacer
+  - event_bindings: {click: home_link_click}
     layout_properties: {}
-  - type: Link
-    properties: {text: Home, foreground: white, bold: true, font_size: 16, icon: 'fa:home'}
     name: home_link
-    layout_properties: {}
-    event_bindings: {click: home_link_click}
-  - type: Spacer
-    properties: {height: 0, width: 10}
+    properties: {bold: true, font_size: 16, foreground: white, icon: 'fa:home', text: Home}
+    type: Link
+  - layout_properties: {}
     name: spacer_2
+    properties: {height: 0, width: 10}
+    type: Spacer
+  - event_bindings: {click: search_link_click}
     layout_properties: {}
-  - type: Link
-    properties: {text: Search, foreground: white, bold: true, font_size: 16, icon: 'fa:search'}
     name: search_link
-    layout_properties: {}
-    event_bindings: {click: search_link_click}
-  - type: Spacer
-    properties: {height: 0, width: 10}
+    properties: {bold: true, font_size: 16, foreground: white, icon: 'fa:search', text: Search}
+    type: Link
+  - layout_properties: {}
     name: spacer_3
-    layout_properties: {}
-  - type: Link
-    properties: {text: Comparison, foreground: white, bold: true, font_size: 16, icon: 'fa:exchange'}
-    name: comparison_link
-    layout_properties: {}
-    event_bindings: {click: comparison_link_click}
-  - type: Spacer
     properties: {height: 0, width: 10}
+    type: Spacer
+  - event_bindings: {click: comparison_link_click}
+    layout_properties: {}
+    name: comparison_link
+    properties: {bold: true, font_size: 16, foreground: white, icon: 'fa:exchange', text: Comparison}
+    type: Link
+  - layout_properties: {}
     name: spacer_4
+    properties: {height: 0, width: 10}
+    type: Spacer
+  - event_bindings: {click: open_server_test}
     layout_properties: {}
-  - type: Link
-    properties: {text: Server Test, foreground: white, bold: true, font_size: 16, icon: 'fa:server'}
     name: server_test_link
-    layout_properties: {}
-    event_bindings: {click: open_server_test}
-- type: Spacer
-  properties: {height: 20}
+    properties: {bold: true, font_size: 16, foreground: white, icon: 'fa:server', text: Server Test}
+    type: Link
+  layout_properties: {grid_position: 'AAAAAA,BBBBBB'}
+  name: nav_bar
+  properties: {align: center, background: primary, role: default, spacing: large}
+  type: FlowPanel
+- layout_properties: {grid_position: 'CCCCCC,DDDDDD'}
   name: nav_spacer
-  layout_properties: {grid_position: 'CCCCCC,DDDDDD'}
-- type: ColumnPanel
-  properties: {role: card, visible: true}
-  name: welcome_panel
-  layout_properties: {grid_position: 'WERTYU,ASDFGH'}
-  components:
-  - type: Label
-    properties: {text: Welcome to Transcription App, role: headline, align: center, font_size: 24}
+  properties: {height: 20}
+  type: Spacer
+- components:
+  - layout_properties: {grid_position: 'QAZWSX,EDCRFV'}
     name: welcome_title
-    layout_properties: {grid_position: 'QAZWSX,EDCRFV'}
-  - type: Label
-    properties: {text: This client-side application helps you practice transcription and search for videos., align: center}
+    properties: {align: center, font_size: 24, role: headline, text: Welcome to Transcription App}
+    type: Label
+  - layout_properties: {grid_position: 'TGBYHN,UJMIKOL'}
     name: welcome_text
-    layout_properties: {grid_position: 'TGBYHN,UJMIKOL'}
-  - type: Image
-    properties: {source: 'https://img.icons8.com/color/96/000000/microphone--v1.png', width: 96, align: center}
+    properties: {align: center, text: This client-side application helps you practice transcription and search for videos.}
+    type: Label
+  - layout_properties: {grid_position: 'RFVTGB,YHNUJM'}
     name: welcome_image
-    layout_properties: {grid_position: 'RFVTGB,YHNUJM'}
-  - type: FlowPanel
-    properties: {align: center, spacing: large}
-    name: welcome_buttons
-    layout_properties: {grid_position: 'ZXCVBN,MLKJHG'}
-    components:
-    - type: Button
-      properties: {text: Start Searching, role: primary, icon: 'fa:search'}
+    properties: {align: center, source: 'https://img.icons8.com/color/96/000000/microphone--v1.png', width: 96}
+    type: Image
+  - components:
+    - event_bindings: {click: welcome_search_button_click}
+      layout_properties: {}
       name: welcome_search_button
+      properties: {icon: 'fa:search', role: primary, text: Start Searching}
+      type: Button
+    - event_bindings: {click: welcome_compare_button_click}
       layout_properties: {}
-      event_bindings: {click: welcome_search_button_click}
-    - type: Button
-      properties: {text: Practice Comparison, role: primary-color, icon: 'fa:exchange'}
       name: welcome_compare_button
-      layout_properties: {}
-      event_bindings: {click: welcome_compare_button_click}
-- type: ColumnPanel
+      properties: {icon: 'fa:exchange', role: primary-color, text: Practice Comparison}
+      type: Button
+    layout_properties: {grid_position: 'ZXCVBN,MLKJHG'}
+    name: welcome_buttons
+    properties: {align: center, spacing: large}
+    type: FlowPanel
+  layout_properties: {grid_position: 'WERTYU,ASDFGH'}
+  name: welcome_panel
   properties: {role: card, visible: true}
-  name: search_panel
-  layout_properties: {grid_position: 'QWERTY,UIOPAS'}
-  components:
-  - type: Label
-    properties: {text: Video Search, role: subheading}
+  type: ColumnPanel
+- components:
+  - layout_properties: {grid_position: 'ZXCVBN,QWERTY'}
     name: search_heading
-    layout_properties: {grid_position: 'ZXCVBN,QWERTY'}
-  - type: TextBox
-    properties: {placeholder: Enter search terms...}
+    properties: {role: subheading, text: Video Search}
+    type: Label
+  - layout_properties: {grid_position: 'ASDFGH,ZXCVBN'}
     name: search_box
-    layout_properties: {grid_position: 'ASDFGH,ZXCVBN'}
-  - type: Button
-    properties: {text: Search, role: primary}
-    name: search_button
+    properties: {placeholder: Enter search terms...}
+    type: TextBox
+  - event_bindings: {click: search_button_click}
     layout_properties: {grid_position: 'ASDFGH,MNBVCX'}
-    event_bindings: {click: search_button_click}
-  - type: ColumnPanel
-    properties: {}
+    name: search_button
+    properties: {role: primary, text: Search}
+    type: Button
+  - layout_properties: {grid_position: 'POIUYT,LKJHGF'}
     name: results_panel
-    layout_properties: {grid_position: 'POIUYT,LKJHGF'}
-- type: ColumnPanel
+    properties: {}
+    type: ColumnPanel
+  layout_properties: {grid_position: 'QWERTY,UIOPAS'}
+  name: search_panel
   properties: {role: card, visible: true}
-  name: compare_panel
-  layout_properties: {grid_position: 'QAZWSX,EDCRFV'}
-  components:
-  - type: Label
-    properties: {text: Text Comparison, role: subheading}
+  type: ColumnPanel
+- components:
+  - layout_properties: {grid_position: 'TGBYHN,UJMIK'}
     name: compare_heading
-    layout_properties: {grid_position: 'TGBYHN,UJMIK'}
-  - type: TextArea
-    properties: {placeholder: Enter first text...}
+    properties: {role: subheading, text: Text Comparison}
+    type: Label
+  - layout_properties: {grid_position: 'RFVTGB,YHNUJM'}
     name: text1_box
-    layout_properties: {grid_position: 'RFVTGB,YHNUJM'}
-  - type: TextArea
-    properties: {placeholder: Enter second text...}
+    properties: {placeholder: Enter first text...}
+    type: TextArea
+  - layout_properties: {grid_position: 'IKLOPÇ,QAZWSX'}
     name: text2_box
-    layout_properties: {grid_position: 'IKLOPÇ,QAZWSX'}
-  - type: Button
-    properties: {text: Compare Texts, role: primary}
-    name: compare_button
+    properties: {placeholder: Enter second text...}
+    type: TextArea
+  - event_bindings: {click: compare_button_click}
     layout_properties: {grid_position: 'EDCRFV,TGBYHN'}
-    event_bindings: {click: compare_button_click}
-  - type: Label
-    properties: {text: Results will appear here, align: center}
+    name: compare_button
+    properties: {role: primary, text: Compare Texts}
+    type: Button
+  - layout_properties: {grid_position: 'UJMIKOLP,ÇQAZWSX'}
     name: result_label
-    layout_properties: {grid_position: 'UJMIKOLP,ÇQAZWSX'}
-is_package: true 
+    properties: {align: center, text: Results will appear here}
+    type: Label
+  layout_properties: {grid_position: 'QAZWSX,EDCRFV'}
+  name: compare_panel
+  properties: {role: card, visible: true}
+  type: ColumnPanel
+container:
+  properties: {col_widths: '{}'}
+  type: ColumnPanel
+is_package: true
