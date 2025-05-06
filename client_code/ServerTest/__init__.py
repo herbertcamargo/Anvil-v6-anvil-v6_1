@@ -51,99 +51,108 @@ class ServerTest(ServerTestTemplate):
     # Create small avatar placeholder (40x40)
     avatar_placeholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='10' text-anchor='middle' fill='%23666666'%3E?%3C/text%3E%3C/svg%3E"
     
-    # Create a global script to replace all placeholder images
+    # Create a global script to intercept ALL network requests to placeholder.com
     placeholder_script = anvil.js.window.document.createElement('script')
     placeholder_script.innerHTML = f"""
-    // Function to replace all placeholder images
-    function replaceAllPlaceholderImages() {{
-      // Create a MutationObserver to watch for new images
-      const observer = new MutationObserver(function(mutations) {{
-        mutations.forEach(function(mutation) {{
+    (function() {{
+      // Block ALL placeholder.com requests at the fetch/XHR level
+      const originalFetch = window.fetch;
+      window.fetch = function(url, options) {{
+        if (url && url.toString().includes('placeholder.com')) {{
+          console.log('Blocked fetch request to placeholder.com:', url);
+          return Promise.resolve(new Response(
+            new Blob([''], {{type: 'text/plain'}}),
+            {{status: 200, statusText: 'Blocked by Anvil'}}
+          ));
+        }}
+        return originalFetch.apply(this, arguments);
+      }};
+      
+      // Block XMLHttpRequest as well
+      const originalOpen = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function(method, url, ...args) {{
+        if (url && url.toString().includes('placeholder.com')) {{
+          console.log('Blocked XHR request to placeholder.com:', url);
+          this.abort();
+          return;
+        }}
+        return originalOpen.apply(this, [method, url, ...args]);
+      }};
+      
+      // Create data URIs for different image sizes
+      const generatePlaceholder = (width, height) => {{
+        if (width <= 40 && height <= 40) {{
+          return "{avatar_placeholder}";
+        }} else {{
+          return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${{width}}' height='${{height}}' viewBox='0 0 ${{width}} ${{height}}'%3E%3Crect width='${{width}}' height='${{height}}' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='${{Math.max(12, Math.min(24, width/10))}}' text-anchor='middle' fill='%23666666'%3E${{width}}x${{height}}%3C/text%3E%3C/svg%3E`;
+        }}
+      }};
+      
+      // Block and replace image sources at the DOM level
+      function replaceImgSrc(img) {{
+        if (img.src && img.src.includes('placeholder.com')) {{
+          // Extract dimensions from URL if possible
+          const match = img.src.match(/placeholder\\.com\\/(\\d+)x(\\d+)/);
+          const width = match ? parseInt(match[1]) : 40;
+          const height = match ? parseInt(match[2]) : 40;
+          
+          // Replace with appropriate SVG
+          img.src = generatePlaceholder(width, height);
+          
+          // Prevent further loading attempts
+          img.setAttribute('data-original-src', 'blocked-placeholder');
+        }}
+      }}
+      
+      // Process all existing images
+      document.querySelectorAll('img').forEach(replaceImgSrc);
+      
+      // Watch for dynamically added images
+      const observer = new MutationObserver(mutations => {{
+        mutations.forEach(mutation => {{
           if (mutation.addedNodes) {{
-            mutation.addedNodes.forEach(function(node) {{
-              // Check if the node is an element
-              if (node.nodeType === 1) {{
-                // Find all images in the node
-                const images = node.querySelectorAll ? node.querySelectorAll('img') : [];
-                if (node.tagName === 'IMG') images.push(node);
-                
-                // Process each image
-                images.forEach(function(img) {{
-                  if (img.src && img.src.includes('placeholder.com')) {{
-                    // Get image dimensions from the placeholder URL
-                    const src = img.src;
-                    const match = src.match(/placeholder\\.com\\/(\\d+)x(\\d+)/);
-                    
-                    if (match && match[1] && match[2]) {{
-                      const width = match[1];
-                      const height = match[2];
-                      
-                      // Use dimensions to create appropriate SVG
-                      if (width <= 40 && height <= 40) {{
-                        // Use avatar placeholder for small images
-                        img.src = "{avatar_placeholder}";
-                      }} else {{
-                        // Create a custom sized placeholder
-                        const svgPlaceholder = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${{width}}' height='${{height}}' viewBox='0 0 ${{width}} ${{height}}'%3E%3Crect width='${{width}}' height='${{height}}' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='${{Math.max(12, Math.min(24, width/10))}}' text-anchor='middle' fill='%23666666'%3E${{width}}x${{height}}%3C/text%3E%3C/svg%3E`;
-                        img.src = svgPlaceholder;
-                      }}
-                    }} else {{
-                      // Default placeholder if dimensions can't be determined
-                      img.src = "{avatar_placeholder}";
-                    }}
-                    
-                    // Add error handler in case this fails
-                    img.onerror = function() {{
-                      this.onerror = null;
-                      this.src = "{avatar_placeholder}";
-                    }};
-                  }}
-                }});
+            mutation.addedNodes.forEach(node => {{
+              // Process the node itself if it's an image
+              if (node.nodeName === 'IMG') replaceImgSrc(node);
+              
+              // Process any images inside the node
+              if (node.querySelectorAll) {{
+                node.querySelectorAll('img').forEach(replaceImgSrc);
               }}
             }});
+          }}
+          
+          // Also check for changed src attributes
+          if (mutation.type === 'attributes' && 
+              mutation.attributeName === 'src' && 
+              mutation.target.nodeName === 'IMG') {{
+            replaceImgSrc(mutation.target);
           }}
         }});
       }});
       
-      // Start observing the document with the configured parameters
-      observer.observe(document.body, {{ childList: true, subtree: true }});
-      
-      // Also process existing images
-      document.querySelectorAll('img').forEach(function(img) {{
-        if (img.src && img.src.includes('placeholder.com')) {{
-          // Same logic as above
-          const src = img.src;
-          const match = src.match(/placeholder\\.com\\/(\\d+)x(\\d+)/);
-          
-          if (match && match[1] && match[2]) {{
-            const width = match[1];
-            const height = match[2];
-            
-            if (width <= 40 && height <= 40) {{
-              img.src = "{avatar_placeholder}";
-            }} else {{
-              const svgPlaceholder = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${{width}}' height='${{height}}' viewBox='0 0 ${{width}} ${{height}}'%3E%3Crect width='${{width}}' height='${{height}}' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='${{Math.max(12, Math.min(24, width/10))}}' text-anchor='middle' fill='%23666666'%3E${{width}}x${{height}}%3C/text%3E%3C/svg%3E`;
-              img.src = svgPlaceholder;
-            }}
-          }} else {{
-            img.src = "{avatar_placeholder}";
-          }}
-          
-          img.onerror = function() {{
-            this.onerror = null;
-            this.src = "{avatar_placeholder}";
-          }};
-        }}
+      // Observe the entire document for changes
+      observer.observe(document.documentElement, {{ 
+        childList: true, 
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['src']
       }});
-    }}
-    
-    // Run immediately and after page load
-    replaceAllPlaceholderImages();
-    if (document.readyState === 'complete') {{
-      replaceAllPlaceholderImages();
-    }} else {{
-      window.addEventListener('load', replaceAllPlaceholderImages);
-    }}
+      
+      // Block and prevent any access to placeholder.com at the lowest level
+      // by defining a service worker that blocks those requests
+      if ('serviceWorker' in navigator) {{
+        navigator.serviceWorker.getRegistrations().then(registrations => {{
+          for (let registration of registrations) {{
+            if (registration.scope.includes(window.location.origin)) {{
+              registration.unregister();
+            }}
+          }}
+        }});
+      }}
+      
+      console.log('Placeholder image blocking system initialized');
+    }})();
     """
     
     # Add the script to the document head
