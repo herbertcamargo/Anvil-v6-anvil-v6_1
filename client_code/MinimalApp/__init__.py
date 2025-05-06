@@ -483,93 +483,99 @@ class MinimalApp(MinimalAppTemplate):
       alert("Please enter a search term")
       return
       
-    # Create mock YouTube results without calling the server
-    videos = [
-      {
-        'id': 'dQw4w9WgXcQ',
-        'title': f'Mock YouTube Result 1 for: {query}',
-        'thumbnail_url': 'https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg',
-      },
-      {
-        'id': 'QvKBP1PbSjE',
-        'title': f'Mock YouTube Result 2 for: {query}',
-        'thumbnail_url': 'https://i.ytimg.com/vi/QvKBP1PbSjE/mqdefault.jpg',
-      },
-      {
-        'id': 'G1IbRujko-A',
-        'title': f'Mock YouTube Result 3 for: {query}',
-        'thumbnail_url': 'https://i.ytimg.com/vi/G1IbRujko-A/mqdefault.jpg',
-      },
-      {
-        'id': '7PJA0p-kzOo',
-        'title': f'Mock YouTube Result 4 for: {query}',
-        'thumbnail_url': 'https://i.ytimg.com/vi/7PJA0p-kzOo/mqdefault.jpg',
-      },
-      {
-        'id': 'KpOtuoHL45Y',
-        'title': f'Mock YouTube Result 5 for: {query}',
-        'thumbnail_url': 'https://i.ytimg.com/vi/KpOtuoHL45Y/mqdefault.jpg',
-      },
-      {
-        'id': 'OPf0YbXqDm0',
-        'title': f'Mock YouTube Result 6 for: {query}',
-        'thumbnail_url': 'https://i.ytimg.com/vi/OPf0YbXqDm0/mqdefault.jpg',
-      },
-      {
-        'id': 'J--0d3tFTI4',
-        'title': f'Mock YouTube Result 7 for: {query}',
-        'thumbnail_url': 'https://i.ytimg.com/vi/J--0d3tFTI4/mqdefault.jpg',
-      },
-      {
-        'id': '2vjPBrBU-TM',
-        'title': f'Mock YouTube Result 8 for: {query}',
-        'thumbnail_url': 'https://i.ytimg.com/vi/2vjPBrBU-TM/mqdefault.jpg',
-      },
-      {
-        'id': '09R8_2nJtjg',
-        'title': f'Mock YouTube Result 9 for: {query}',
-        'thumbnail_url': 'https://i.ytimg.com/vi/09R8_2nJtjg/mqdefault.jpg',
-      }
-    ]
-    
-    # Create a separate notification showing we're updating thumbnails
-    Notification("Preparing to update thumbnails...", timeout=2).show()
+    # Show a loading indicator
+    Notification("Searching for videos...", timeout=2).show()
     
     try:
+      # Create mock YouTube results with real YouTube thumbnails
+      # These are actual YouTube video IDs with their thumbnails
+      videos = [
+        {
+          'id': 'dQw4w9WgXcQ',  # Rick Astley - Never Gonna Give You Up
+          'title': f'Result 1: {query} - Music Video',
+          'thumbnail_url': 'https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg',
+        },
+        {
+          'id': '9bZkp7q19f0',  # PSY - Gangnam Style
+          'title': f'Result 2: {query} - Popular Dance',
+          'thumbnail_url': 'https://i.ytimg.com/vi/9bZkp7q19f0/mqdefault.jpg',
+        },
+        {
+          'id': 'fJ9rUzIMcZQ',  # Queen - Bohemian Rhapsody
+          'title': f'Result 3: {query} - Classic Rock',
+          'thumbnail_url': 'https://i.ytimg.com/vi/fJ9rUzIMcZQ/mqdefault.jpg',
+        },
+        {
+          'id': 'kJQP7kiw5Fk',  # Luis Fonsi - Despacito
+          'title': f'Result 4: {query} - Latin Pop',
+          'thumbnail_url': 'https://i.ytimg.com/vi/kJQP7kiw5Fk/mqdefault.jpg',
+        },
+        {
+          'id': 'JGwWNGJdvx8',  # Ed Sheeran - Shape of You
+          'title': f'Result 5: {query} - Pop Music',
+          'thumbnail_url': 'https://i.ytimg.com/vi/JGwWNGJdvx8/mqdefault.jpg',
+        },
+        {
+          'id': 'OPf0YbXqDm0',  # Mark Ronson - Uptown Funk
+          'title': f'Result 6: {query} - Funk/Pop',
+          'thumbnail_url': 'https://i.ytimg.com/vi/OPf0YbXqDm0/mqdefault.jpg',
+        },
+        {
+          'id': 'CevxZvSJLk8',  # Katy Perry - Roar
+          'title': f'Result 7: {query} - Pop Music',
+          'thumbnail_url': 'https://i.ytimg.com/vi/CevxZvSJLk8/mqdefault.jpg',
+        },
+        {
+          'id': 'pRpeEdMmmQ0',  # Imagine Dragons - Believer
+          'title': f'Result 8: {query} - Alternative Rock',
+          'thumbnail_url': 'https://i.ytimg.com/vi/pRpeEdMmmQ0/mqdefault.jpg',
+        },
+        {
+          'id': 'JznMHWXRTBY',  # Simple background video for demonstrations
+          'title': f'Result 9: {query} - Background Video',
+          'thumbnail_url': 'https://i.ytimg.com/vi/JznMHWXRTBY/mqdefault.jpg',
+        }
+      ]
+      
+      # Create a separate notification showing we're updating thumbnails
+      Notification("Loading thumbnails...", timeout=2).show()
+      
       # Update the YouTube grid with new videos
       self.update_youtube_grid(videos)
       
       # Show a notification of success
       Notification(f"Successfully added {len(videos)} videos to grid", timeout=3).show()
+      
+      # Also show text search results for consistency
+      self.results_panel.clear()
+      self.results_panel.add_component(Label(text=f"Text Results for: {query}", role="heading"))
+      
+      # Add some mock results
+      for i in range(3):
+        # Create a card for each mock result
+        card = ColumnPanel(spacing="medium")
+        card.border = "1px solid #ddd"
+        # Set padding using spacing property instead of direct padding attribute
+        card.spacing = ("medium", "medium", "medium", "medium")
+        card.spacing_below = "medium"
+        
+        # Add mock title and info
+        title = Label(text=f"Mock result {i+1} for {query}", role="heading")
+        title.bold = True
+        info = Label(text=f"This is a mock search result showing content for '{query}'")
+        
+        card.add_component(title)
+        card.add_component(info)
+        
+        self.results_panel.add_component(card)
+        
+      # Scroll to both results
+      self.yt_grid_container.scroll_into_view()
+      
     except Exception as e:
-      # Show error notification if update fails
-      alert(f"Error updating grid: {str(e)}")
-    
-    # Also show text search results for consistency
-    self.results_panel.clear()
-    self.results_panel.add_component(Label(text=f"Text Results for: {query}", role="heading"))
-    
-    # Add some mock results
-    for i in range(3):
-      # Create a card for each mock result
-      card = ColumnPanel(spacing="medium")
-      card.border = "1px solid #ddd"
-      # Set padding using spacing property instead of direct padding attribute
-      card.spacing = ("medium", "medium", "medium", "medium")
-      card.spacing_below = "medium"
-      
-      # Add mock title and info
-      title = Label(text=f"Mock result {i+1} for {query}", role="heading")
-      title.bold = True
-      info = Label(text="This is a client-side only mock result (no server call)")
-      
-      card.add_component(title)
-      card.add_component(info)
-      
-      self.results_panel.add_component(card)
-      
-    # Scroll to both results
-    self.yt_grid_container.scroll_into_view()
+      # Show error notification if search fails
+      alert(f"Error during search: {str(e)}")
+      print(f"Search error: {str(e)}")
     
   def compare_button_click(self, **event_args):
     """Compare texts without server calls"""

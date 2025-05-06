@@ -474,80 +474,85 @@ class ServerTest(ServerTestTemplate):
     try:
       # Try to call server function for search
       self.search_status.text = "Trying server search..."
-      videos = anvil.server.call('search_youtube', query)
-      self.search_status.text = "Search completed via server!"
-      self.search_status.foreground = "#4CAF50"  # Green color
       
-    except Exception as e:
-      # Fall back to client-side mock data if server function fails
-      self.search_status.text = f"Server search failed, using mock data: {str(e)}"
-      self.search_status.foreground = "#FF9800"  # Orange color
+      try:
+        videos = anvil.server.call('search_youtube', query)
+        self.search_status.text = "Search completed via server!"
+        self.search_status.foreground = "#4CAF50"  # Green color
+      except Exception as server_error:
+        # Fall back to client-side mock data if server function fails
+        self.search_status.text = f"Server search failed, using mock data: {str(server_error)}"
+        self.search_status.foreground = "#FF9800"  # Orange color
+        
+        # Create mock YouTube results with real YouTube thumbnails
+        # These are actual YouTube video IDs with their thumbnails
+        videos = [
+          {
+            'id': 'dQw4w9WgXcQ',  # Rick Astley - Never Gonna Give You Up
+            'title': f'Result 1: {query} - Music Video',
+            'thumbnail_url': 'https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg',
+          },
+          {
+            'id': '9bZkp7q19f0',  # PSY - Gangnam Style
+            'title': f'Result 2: {query} - Popular Dance',
+            'thumbnail_url': 'https://i.ytimg.com/vi/9bZkp7q19f0/mqdefault.jpg',
+          },
+          {
+            'id': 'fJ9rUzIMcZQ',  # Queen - Bohemian Rhapsody
+            'title': f'Result 3: {query} - Classic Rock',
+            'thumbnail_url': 'https://i.ytimg.com/vi/fJ9rUzIMcZQ/mqdefault.jpg',
+          },
+          {
+            'id': 'kJQP7kiw5Fk',  # Luis Fonsi - Despacito
+            'title': f'Result 4: {query} - Latin Pop',
+            'thumbnail_url': 'https://i.ytimg.com/vi/kJQP7kiw5Fk/mqdefault.jpg',
+          },
+          {
+            'id': 'JGwWNGJdvx8',  # Ed Sheeran - Shape of You
+            'title': f'Result 5: {query} - Pop Music',
+            'thumbnail_url': 'https://i.ytimg.com/vi/JGwWNGJdvx8/mqdefault.jpg',
+          },
+          {
+            'id': 'OPf0YbXqDm0',  # Mark Ronson - Uptown Funk
+            'title': f'Result 6: {query} - Funk/Pop',
+            'thumbnail_url': 'https://i.ytimg.com/vi/OPf0YbXqDm0/mqdefault.jpg',
+          },
+          {
+            'id': 'CevxZvSJLk8',  # Katy Perry - Roar
+            'title': f'Result 7: {query} - Pop Music',
+            'thumbnail_url': 'https://i.ytimg.com/vi/CevxZvSJLk8/mqdefault.jpg',
+          },
+          {
+            'id': 'pRpeEdMmmQ0',  # Imagine Dragons - Believer
+            'title': f'Result 8: {query} - Alternative Rock',
+            'thumbnail_url': 'https://i.ytimg.com/vi/pRpeEdMmmQ0/mqdefault.jpg',
+          },
+          {
+            'id': 'JznMHWXRTBY',  # Simple background video for demonstrations
+            'title': f'Result 9: {query} - Background Video',
+            'thumbnail_url': 'https://i.ytimg.com/vi/JznMHWXRTBY/mqdefault.jpg',
+          }
+        ]
+    
+      # Create a separate notification showing we're updating thumbnails
+      Notification("Loading thumbnails...", timeout=2).show()
       
-      # Create mock YouTube results
-      videos = [
-        {
-          'id': 'dQw4w9WgXcQ',
-          'title': f'Mock YouTube Result 1 for: {query}',
-          'thumbnail_url': 'https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg',
-        },
-        {
-          'id': 'QvKBP1PbSjE',
-          'title': f'Mock YouTube Result 2 for: {query}',
-          'thumbnail_url': 'https://i.ytimg.com/vi/QvKBP1PbSjE/mqdefault.jpg',
-        },
-        {
-          'id': 'G1IbRujko-A',
-          'title': f'Mock YouTube Result 3 for: {query}',
-          'thumbnail_url': 'https://i.ytimg.com/vi/G1IbRujko-A/mqdefault.jpg',
-        },
-        {
-          'id': '7PJA0p-kzOo',
-          'title': f'Mock YouTube Result 4 for: {query}',
-          'thumbnail_url': 'https://i.ytimg.com/vi/7PJA0p-kzOo/mqdefault.jpg',
-        },
-        {
-          'id': 'KpOtuoHL45Y',
-          'title': f'Mock YouTube Result 5 for: {query}',
-          'thumbnail_url': 'https://i.ytimg.com/vi/KpOtuoHL45Y/mqdefault.jpg',
-        },
-        {
-          'id': 'OPf0YbXqDm0',
-          'title': f'Mock YouTube Result 6 for: {query}',
-          'thumbnail_url': 'https://i.ytimg.com/vi/OPf0YbXqDm0/mqdefault.jpg',
-        },
-        {
-          'id': 'J--0d3tFTI4',
-          'title': f'Mock YouTube Result 7 for: {query}',
-          'thumbnail_url': 'https://i.ytimg.com/vi/J--0d3tFTI4/mqdefault.jpg',
-        },
-        {
-          'id': '2vjPBrBU-TM',
-          'title': f'Mock YouTube Result 8 for: {query}',
-          'thumbnail_url': 'https://i.ytimg.com/vi/2vjPBrBU-TM/mqdefault.jpg',
-        },
-        {
-          'id': '09R8_2nJtjg',
-          'title': f'Mock YouTube Result 9 for: {query}',
-          'thumbnail_url': 'https://i.ytimg.com/vi/09R8_2nJtjg/mqdefault.jpg',
-        }
-      ]
-    
-    # Create a separate notification showing we're updating thumbnails
-    Notification("Preparing to update thumbnails...", timeout=2).show()
-    
-    try:
-      # Update the YouTube grid with videos
+      # Update the YouTube grid with new videos
       self.update_youtube_grid(videos)
       
       # Show a notification of success
       Notification(f"Successfully added {len(videos)} videos to grid", timeout=3).show()
-    except Exception as e:
-      # Show error notification if update fails
-      alert(f"Error updating grid: {str(e)}")
-    
-    # Scroll to see results
-    self.yt_grid_container.scroll_into_view()
       
+      # Scroll to see results
+      self.yt_grid_container.scroll_into_view()
+      
+    except Exception as e:
+      # Show error notification if search completely fails
+      self.search_status.text = f"Search failed: {str(e)}"
+      self.search_status.foreground = "#F44336"  # Red color
+      alert(f"Error during search: {str(e)}")
+      print(f"Search error: {str(e)}")
+    
   def back_home_link_click(self, **event_args):
     """This method is called when the link is clicked"""
     open_form('MinimalApp')
