@@ -1,6 +1,13 @@
 <template>
-  <div class="video-processor">
+  <div class="video-processor vue">
     <h2>WebAssembly Video Processor (Vue)</h2>
+    
+    <div v-if="isOffline" class="offline-banner">
+      <p>You are currently offline. {{ isVideoSavedOffline ? 
+        'This video is available for offline use.' : 
+        'Some features may be limited.' }}
+      </p>
+    </div>
     
     <div class="controls">
       <input 
@@ -8,6 +15,8 @@
         accept="video/*" 
         @change="handleFileChange" 
         class="file-input"
+        ref="fileInput"
+        :disabled="isOffline && !isVideoSavedOffline"
       />
       
       <button 
@@ -16,6 +25,14 @@
         class="play-button"
       >
         {{ isPlaying ? 'Pause' : 'Play' }}
+      </button>
+      
+      <button 
+        v-if="videoFile && !isVideoSavedOffline && !isOffline"
+        @click="saveVideoForOffline"
+        class="save-offline-button"
+      >
+        Save for Offline
       </button>
       
       <div class="effect-selector">
@@ -47,10 +64,17 @@
     <div class="video-container">
       <div class="video-wrapper">
         <h3>Original</h3>
+        <img 
+          v-if="thumbnailUrl && !isPlaying"
+          :src="thumbnailUrl" 
+          alt="Video thumbnail" 
+          class="video-thumbnail"
+        />
         <video 
           ref="video" 
           :src="videoFile" 
-          :style="{ display: videoFile ? 'block' : 'none' }"
+          :style="{ display: videoFile && (!thumbnailUrl || isPlaying) ? 'block' : 'none' }"
+          @loadedmetadata="onVideoLoad"
         />
       </div>
       
@@ -70,20 +94,36 @@
 </template>
 
 <script>
+import { 
+  registerServiceWorker, 
+  storeVideoForOffline, 
+  getOfflineVideo, 
+  createAndCacheVideoThumbnail, 
+  isVideoAvailableOffline 
+} from '../service-worker-registration';
+
 export default {
   name: 'VideoProcessor',
   data() {
     return {
       videoFile: null,
+      videoFileName: null,
+      videoId: null,
       isPlaying: false,
       effectType: 0, // 0: grayscale, 1: sepia, 2: brightness, 3: blur
       effectParam: 1.0,
       wasmReady: false,
+      isOffline: !navigator.onLine,
+      isVideoSavedOffline: false,
+      thumbnailUrl: null,
       processor: null,
       stopProcessing: null
     };
   },
   mounted() {
+    // Register service worker
+    registerServiceWorker();
+    
     // Initialize WebAssembly processor
     if (window.VideoProcessorWrapper) {
       this.initProcessor();
@@ -96,12 +136,26 @@ export default {
       };
       document.head.appendChild(script);
     }
+    
+    // Monitor online/offline status
+    window.addEventListener('online', this.handleOnlineStatusChange);
+    window.addEventListener('offline', this.handleOnlineStatusChange);
   },
   beforeUnmount() {
     // Clean up processing on unmount
     if (this.stopProcessing) {
       this.stopProcessing();
       this.stopProcessing = null;
+    }
+    
+    window.removeEventListener('online', this.handleOnlineStatusChange);
+    window.removeEventListener('offline', this.handleOnlineStatusChange);
+  },
+  watch: {
+    isOffline(newValue) {
+      if (newValue && this.videoId) {
+        this.checkOfflineAvailability(this.videoId);
+      }
     }
   },
   methods: {
@@ -111,11 +165,84 @@ export default {
         this.wasmReady = true;
       });
     },
+    handleOnlineStatusChange() {
+      this.isOffline = !navigator.onLine;
+    },
+    async checkOfflineAvailability(id) {
+      const available = await isVideoAvailableOffline(id);
+      this.isVideoSavedOffline = available;
+      
+      // If we're offline and the video is available, load it
+      if (this.isOffline && available) {
+        this.loadOfflineVideo(id);
+      }
+    },
+    async loadOfflineVideo(id) {
+      try {
+        const { videoData, metadata } = await getOfflineVideo(id);
+        
+        if (videoData && this.$refs.video) {
+          // Create a blob from the stored data
+          const blob = new Blob([videoData], { type: metadata.type });
+          const url = URL.createObjectURL(blob);
+          
+          this.videoFile = url;
+          this.videoFileName = metadata.name;
+          this.$refs.video.src = url;
+          
+          // Set thumbnail if available
+          if (metadata.thumbnailUrl) {
+            this.thumbnailUrl = metadata.thumbnailUrl;
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load offline video:', error);
+      }
+    },
+    async saveVideoForOffline() {
+      if (!this.videoFile || !this.$refs.video || !this.videoId) return;
+      
+      try {
+        // Get the video data
+        const response = await fetch(this.videoFile);
+        const videoBlob = await response.blob();
+        const videoArrayBuffer = await videoBlob.arrayBuffer();
+        
+        // Create and cache a thumbnail
+        const thumbUrl = await createAndCacheVideoThumbnail(this.videoId, this.$refs.video);
+        
+        // Save to IndexedDB
+        await storeVideoForOffline(this.videoId, videoArrayBuffer, {
+          name: this.videoFileName,
+          type: videoBlob.type,
+          size: videoBlob.size,
+          thumbnailUrl: thumbUrl,
+          timestamp: new Date().getTime()
+        });
+        
+        this.isVideoSavedOffline = true;
+        this.thumbnailUrl = thumbUrl;
+        
+        // Show success notification
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('Video Saved Offline', {
+            body: `${this.videoFileName} is now available for offline use.`,
+            icon: thumbUrl
+          });
+        }
+      } catch (error) {
+        console.error('Failed to save video for offline use:', error);
+      }
+    },
     handleFileChange(e) {
       const file = e.target.files[0];
       if (file) {
         const url = URL.createObjectURL(file);
         this.videoFile = url;
+        this.videoFileName = file.name;
+        
+        // Generate a unique ID for this video
+        this.videoId = `video_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         
         if (this.$refs.video) {
           this.$refs.video.src = url;
@@ -128,6 +255,15 @@ export default {
         }
         
         this.isPlaying = false;
+        this.isVideoSavedOffline = false;
+        this.thumbnailUrl = null;
+      }
+    },
+    onVideoLoad() {
+      if (this.videoId && !this.thumbnailUrl) {
+        createAndCacheVideoThumbnail(this.videoId, this.$refs.video)
+          .then(url => this.thumbnailUrl = url)
+          .catch(err => console.error('Error creating thumbnail:', err));
       }
     },
     handlePlayPause() {
@@ -152,6 +288,18 @@ export default {
             this.effectType,
             this.effectParam
           );
+          
+          // Create thumbnail after a short delay if none exists
+          if (!this.thumbnailUrl && this.videoId) {
+            setTimeout(async () => {
+              try {
+                const thumbUrl = await createAndCacheVideoThumbnail(this.videoId, this.$refs.video);
+                this.thumbnailUrl = thumbUrl;
+              } catch (error) {
+                console.error('Failed to create thumbnail:', error);
+              }
+            }, 500);
+          }
         }
       }
       
@@ -220,6 +368,23 @@ export default {
   cursor: not-allowed;
 }
 
+.save-offline-button {
+  padding: 8px 15px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.offline-banner {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+}
+
 .effect-selector, .param-slider {
   display: flex;
   align-items: center;
@@ -241,6 +406,14 @@ video, canvas {
   width: 100%;
   background-color: #000;
   border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.video-thumbnail {
+  width: 100%;
+  background-color: #000;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 .loading {

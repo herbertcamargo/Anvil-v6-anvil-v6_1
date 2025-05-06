@@ -3,13 +3,14 @@ const { VueLoaderPlugin } = require('vue-loader');
 
 module.exports = {
   entry: {
-    reactComponents: './src/react/index.js',
-    vueComponents: './src/vue/index.js'
+    'react': './src/react/index.js',
+    'vue': './src/vue/index.js',
+    'service-worker-registration': './src/service-worker-registration.js'
   },
   output: {
-    path: path.resolve(__dirname, '../js/components'),
-    filename: '[name].js',
-    library: '[name]',
+    filename: '[name].bundle.js',
+    path: path.resolve(__dirname, '../../theme/js'),
+    library: '[name]Components',
     libraryTarget: 'umd',
     globalObject: 'this'
   },
@@ -40,5 +41,13 @@ module.exports = {
   ],
   resolve: {
     extensions: ['.js', '.jsx', '.vue']
+  },
+  externals: {
+    'react': 'React',
+    'react-dom': 'ReactDOM',
+    'vue': 'Vue'
+  },
+  performance: {
+    hints: false
   }
 }; 
