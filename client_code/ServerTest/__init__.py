@@ -54,8 +54,8 @@ class ServerTest(ServerTestTemplate):
   def return_to_main_app(self, **event_args):
     """Return to the main application"""
     try:
-      self.result_label.text = "Returning to main app..."
-      open_form('CompareTranscription')
+      self.result_label.text = "Opening minimal app..."
+      open_form('MinimalApp')
     except Exception as e:
-      self.result_label.text = f"Error returning to main app: {str(e)}"
+      self.result_label.text = f"Error opening minimal app: {str(e)}"
       self.result_label.foreground = "#aa0000"  # Red for error 
