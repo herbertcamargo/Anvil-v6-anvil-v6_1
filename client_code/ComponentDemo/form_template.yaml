@@ -1,0 +1,40 @@
+container:
+  type: ColumnPanel
+  properties: {}
+  components:
+  - type: Label
+    properties:
+      text: React and Vue Components Demo
+      align: center
+      font_size: 24
+    name: title_label
+  - type: ColumnPanel
+    properties:
+      col_widths: {}
+    name: component_container
+    components:
+    - type: Label
+      properties:
+        text: React Component
+        font_size: 20
+        align: center
+      name: react_label
+    - type: Html
+      properties:
+        html: <div id="react-container" style="width: 100%; min-height: 300px;"></div>
+      name: react_container
+    - type: Spacer
+      properties:
+        height: 30
+      name: spacer_1
+    - type: Label
+      properties:
+        text: Vue Component
+        font_size: 20
+        align: center
+      name: vue_label
+    - type: Html
+      properties:
+        html: <div id="vue-container" style="width: 100%; min-height: 300px;"></div>
+      name: vue_container
+is_package: true 

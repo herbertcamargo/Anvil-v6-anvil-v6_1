@@ -6,14 +6,15 @@
 
 ## Contents
 
-In this guide, we’ll walk through the key components of the template, covering:
+In this guide, we'll walk through the key components of the template, covering:
 
 - **[Introduction](#introduction)**: Briefly learn about Anvil and the benefits of using this template.
-- **[Prerequisites](#prerequisites)**: What you’ll need to get started.
-- **[Template Structure](#understanding-the-templates-structure)**: A high-level overview of the app’s architecture and Stripe integration.
+- **[Prerequisites](#prerequisites)**: What you'll need to get started.
+- **[Template Structure](#understanding-the-templates-structure)**: A high-level overview of the app's architecture and Stripe integration.
 - **[Template Setup](#setting-up-the-template)**: Step-by-step instructions to get the template up and running with your account.
-- **[Testing The App](#testing-the-app)**: Test the integration and explore the template’s functionality from a user’s perspective. 
+- **[Testing The App](#testing-the-app)**: Test the integration and explore the template's functionality from a user's perspective. 
 - **[Make The app Your Own](#making-the-app-your-own)**: With the integration set up, it's time to make the app your own.
+- **[Using React/Vue Components](#using-reactvue-components)**: Create rich, interactive UI components using React or Vue.
 
 ## Introduction
 
@@ -200,7 +201,7 @@ You can use `@anvil.server.callable`, `user_has_subscription` and `@catch_permis
 
 ##### 1. You restrict access to a function with `@anvil.server.callable` and `user_has_subscription`
 
-To restrict access to a premium function to users with a valid subscription, start by decorating the premium function with `@anvil.server.callable`. You can pass `@anvil.server.callable`'s `require_user` argument `user_has_subscription`. `user_has_subscription` takes a list of allowed subscriptions and checks if the logged-in user’s subscription matches any entry in the list.
+To restrict access to a premium function to users with a valid subscription, start by decorating the premium function with `@anvil.server.callable`. You can pass `@anvil.server.callable`'s `require_user` argument `user_has_subscription`. `user_has_subscription` takes a list of allowed subscriptions and checks if the logged-in user's subscription matches any entry in the list.
 
 From the template, this example function is only allowed to be run by users with a "personal" subscription:
 
@@ -212,11 +213,11 @@ def calculate_percentage_of(number, total_number):
     return percentage
 ```
 
-If the user has an active subscription which is in the allowed subscriptions passed to `user_has_subscription`, the function will run. If they don’t meet the subscription requirement, a permissions error is raised and caught by `@catch_permission_errors` - let me show you how to use `@catch_permission_errors`.
+If the user has an active subscription which is in the allowed subscriptions passed to `user_has_subscription`, the function will run. If they don't meet the subscription requirement, a permissions error is raised and caught by `@catch_permission_errors` - let me show you how to use `@catch_permission_errors`.
 
 ##### 2. You use `@catch_permission_errors` on the client-side to prompt user
   
-With the server-side function restricted, it's time to prompt users to upgrade if they try to use a premium feature without the right subscription - for this, you can use `@catch_permission_errors`. `@catch_permission_errors` will catch any `anvil.server.PermissionDenied` exceptions thrown by our server-side function and prompt users to upgrade if they don’t meet the subscription requirement.
+With the server-side function restricted, it's time to prompt users to upgrade if they try to use a premium feature without the right subscription - for this, you can use `@catch_permission_errors`. `@catch_permission_errors` will catch any `anvil.server.PermissionDenied` exceptions thrown by our server-side function and prompt users to upgrade if they don't meet the subscription requirement.
 
 From the example in the template:
 
@@ -242,3 +243,47 @@ When you're ready to go live, switch Stripe from [test mode](https://docs.stripe
 Next, update the app's account management link (configured in [step 7](#step-7---setting-up-the-customer-portal)) to use the [customer portal's live link](https://docs.stripe.com/customer-management/activate-no-code-customer-portal#url-parameters).
 
 Finally, replace the [API keys](#step-2---add-the-api-key) in your Anvil app with the production keys.
+
+## Using React/Vue Components
+
+This template now includes support for building UI components with React or Vue.js. These components can be embedded in your Anvil forms for rich, interactive user interfaces.
+
+### Setup
+
+1. Navigate to the `client_code/components` directory in your terminal.
+2. Run the appropriate build script for your operating system:
+   ```
+   # On Windows
+   ./build.ps1
+   
+   # On Mac/Linux
+   chmod +x build.sh
+   ./build.sh
+   ```
+
+### Using Components
+
+1. A demo form is available at `client_code/ComponentDemo` which shows React and Vue Todo List components.
+2. You can add new components by following the guidelines in `client_code/components/README.md`.
+
+### Creating Your Own Components
+
+Follow these steps to create your own components:
+
+1. Create component files in `client_code/components/src/react/` or `client_code/components/src/vue/`
+2. Register them in the respective index.js files
+3. Build the components using the build script
+4. Add an HTML component to your Anvil form with a specific ID
+5. Use the following Python code to render your component:
+
+```python
+import anvil.js
+
+# For React components
+anvil.js.call_js('window.renderReactComponent', 'ComponentName', 'container-id', props)
+
+# For Vue components
+anvil.js.call_js('window.renderVueComponent', 'ComponentName', 'container-id', props)
+```
+
+See `client_code/components/README.md` for detailed instructions.

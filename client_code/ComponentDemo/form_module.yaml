@@ -1,0 +1,5 @@
+container: {type: ColumnPanel}
+components: []
+is_package: true
+name: ComponentDemo
+title: React/Vue Components Demo
