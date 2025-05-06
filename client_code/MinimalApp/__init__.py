@@ -213,15 +213,21 @@ class MinimalApp(MinimalAppTemplate):
     # Create thumbnails using direct HTML insertion
     thumbnails_html = ""
     
+    # Data URI for default thumbnail (gray background with text)
+    default_thumbnail = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='180' viewBox='0 0 320 180'%3E%3Crect width='320' height='180' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='24' text-anchor='middle' fill='%23666666'%3ENo Thumbnail%3C/text%3E%3C/svg%3E"
+    
     for i, video in enumerate(videos_data[:12]):
       video_id = video.get('id', '')
       title = video.get('title', 'Untitled video')
-      thumbnail_url = video.get('thumbnail_url', 'https://via.placeholder.com/320x180')
+      # Use the provided thumbnail URL or the default if it's a placeholder or missing
+      thumbnail_url = video.get('thumbnail_url', default_thumbnail)
+      if "placeholder.com" in thumbnail_url:
+        thumbnail_url = default_thumbnail
       
       # Create the thumbnail HTML with a data attribute for the index
       thumbnails_html += f"""
         <div class="thumbnail-container" data-index="{i}" data-video-id="{video_id}" onclick="handleThumbnailClick({i})">
-          <img src="{thumbnail_url}" alt="{title}" class="thumbnail-image">
+          <img src="{thumbnail_url}" alt="{title}" class="thumbnail-image" onerror="this.onerror=null; this.src='{default_thumbnail}'">
           <p class="video-title">{title}</p>
         </div>
       """
