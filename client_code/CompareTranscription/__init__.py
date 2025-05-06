@@ -72,6 +72,15 @@ class CompareTranscription(CompareTranscriptionTemplate):
         alert("Please enter a search term.")
         return
 
+      # Try a completely minimal test first
+      try:
+        Notification("Testing minimal server function...", timeout=2).show()
+        minimal_result = anvil.server.call('minimal_test')
+        Notification(f"Minimal test result: {minimal_result}", timeout=2).show()
+      except Exception as e:
+        alert(f"Minimal server test failed: {str(e)}")
+        return
+
       # First test the server connection with a simple function
       try:
         Notification("Testing server connection...", timeout=2).show()
