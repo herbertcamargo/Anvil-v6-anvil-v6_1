@@ -24,7 +24,7 @@ class MinimalApp(MinimalAppTemplate):
       # Create a card for each mock result
       card = ColumnPanel(spacing="medium")
       card.border = "1px solid #ddd"
-      card.padding = 10
+      card.spacing = ("medium", "medium", "medium", "medium")
       card.spacing_below = "medium"
       
       # Add mock title and info
