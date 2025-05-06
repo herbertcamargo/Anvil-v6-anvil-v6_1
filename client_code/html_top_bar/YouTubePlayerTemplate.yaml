@@ -1,0 +1,47 @@
+container: {type: ColumnPanel}
+components:
+- name: player_html
+  type: Html
+  layout_properties: {grid_position: 'DLGNAV,0,0'}
+  properties:
+    html: |
+      <style>
+        .youtube-player-wrapper {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+        }
+        
+        .video-title-display {
+          font-size: 18px;
+          font-weight: 600;
+          margin: 10px 0;
+          padding: 0 10px;
+        }
+        
+        .youtube-player-container {
+          position: relative;
+          width: 100%;
+          padding-bottom: 56.25%; /* 16:9 aspect ratio */
+          height: 0;
+          overflow: hidden;
+          border-radius: 8px;
+        }
+        
+        .youtube-iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border-radius: 8px;
+        }
+      </style>
+      
+      <div class="youtube-player-wrapper">
+        <h2 class="video-title-display">Select a video to play</h2>
+        <div class="youtube-player-container">
+          <!-- YouTube iframe will be inserted here dynamically -->
+        </div>
+      </div>
+is_package: true 
