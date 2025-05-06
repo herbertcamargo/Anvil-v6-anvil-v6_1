@@ -210,7 +210,7 @@ class MinimalApp(MinimalAppTemplate):
     # Clear existing content
     grid_container.innerHTML = ''
     
-    # Create thumbnails using direct HTML insertion instead of DOM API
+    # Create thumbnails using direct HTML insertion
     thumbnails_html = ""
     
     for i, video in enumerate(videos_data[:12]):
@@ -220,29 +220,36 @@ class MinimalApp(MinimalAppTemplate):
       
       # Create the thumbnail HTML with a data attribute for the index
       thumbnails_html += f"""
-        <div class="thumbnail-container" data-index="{i}" data-video-id="{video_id}">
+        <div class="thumbnail-container" data-index="{i}" data-video-id="{video_id}" onclick="handleThumbnailClick({i})">
           <img src="{thumbnail_url}" alt="{title}" class="thumbnail-image">
           <p class="video-title">{title}</p>
         </div>
       """
     
+    # First, inject the click handler function into the page
+    click_handler_script = anvil.js.window.document.createElement('script')
+    click_handler_script.innerHTML = """
+      function handleThumbnailClick(index) {
+        var event = new CustomEvent('thumbnail-click', { detail: { index: index } });
+        document.dispatchEvent(event);
+      }
+    """
+    anvil.js.window.document.head.appendChild(click_handler_script)
+    
     # Set all thumbnails at once
     grid_container.innerHTML = thumbnails_html
     
-    # Add a single event listener to the container using event delegation
-    grid_container.addEventListener('click', anvil.js.window.Function('event', 
-      f"""
-      var target = event.target.closest('.thumbnail-container');
-      if (target) {{
-        var index = parseInt(target.getAttribute('data-index'));
-        this.anvil.components["{self.grid_html._id}"]._on_event("x-thumbnail-click", {{index: index}});
-      }}
-      """
-    ))
+    # Add a document-level event listener for the custom event
+    def handle_thumbnail_event(e):
+      index = e.detail.index
+      self.thumbnail_click(dict(index=index))
     
-    # Register the thumbnail click handler
-    self.grid_html.set_event_handler('x-thumbnail-click', self.thumbnail_click)
-      
+    # Store the event listener function to be able to remove it later if needed
+    self._thumbnail_handler = handle_thumbnail_event
+    
+    # Add the event listener to the document
+    anvil.js.window.document.addEventListener('thumbnail-click', self._thumbnail_handler)
+    
   def thumbnail_click(self, **event_args):
     """Handle thumbnail click from HTML"""
     index = event_args.get('index', 0)
