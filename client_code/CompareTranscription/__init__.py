@@ -22,6 +22,13 @@ class CompareTranscription(CompareTranscriptionTemplate):
     if video_id:
       # Handle the video_id if needed
       self.load_video(video_id)
+      
+    # Test the server connection on load
+    try:
+      test_result = anvil.server.call('test_server_function')
+      print(f"Server connection test: {test_result['message']}")
+    except Exception as e:
+      print(f"Server connection test failed: {str(e)}")
 
   def load_video(self, video_id):
     # This would be used to load a specific video by ID
@@ -29,24 +36,34 @@ class CompareTranscription(CompareTranscriptionTemplate):
     Notification(f"Loading video with ID: {video_id}", timeout=3).show()
 
   def compare_button_click(self, **event_args):
-    user_text = self.user_input_box.text
-    official_text = self.official_input_box.text
-    selected_lang = self.language_dropdown.selected_value or 'en'
+    try:
+      user_text = self.user_input_box.text
+      official_text = self.official_input_box.text
+      selected_lang = self.language_dropdown.selected_value or 'en'
 
-    if not user_text or not official_text:
-      alert("Please fill in both fields.")
-      return
+      if not user_text or not official_text:
+        alert("Please fill in both fields.")
+        return
 
-    # Passa o idioma selecionado, se necessário no futuro
-    result = anvil.server.call("compare_transcriptions", user_text, official_text)
+      Notification("Comparing texts...", timeout=2).show()
+      
+      # Call the server function
+      result = anvil.server.call("compare_transcriptions", user_text, official_text)
 
-    self.comparison_output.content = result["html"]
-    self.accuracy_label.text = (
-      f"Accuracy: {result['stats']['accuracy']}% — "
-      f"{result['stats']['correct']} correct, "
-      f"{result['stats']['incorrect']} wrong, "
-      f"{result['stats']['missing']} missing"
-    )
+      if not result or 'html' not in result or 'stats' not in result:
+        raise ValueError("Invalid comparison result from server")
+        
+      self.comparison_output.content = result["html"]
+      self.accuracy_label.text = (
+        f"Accuracy: {result['stats']['accuracy']}% — "
+        f"{result['stats']['correct']} correct, "
+        f"{result['stats']['incorrect']} wrong, "
+        f"{result['stats']['missing']} missing"
+      )
+      
+      Notification("Comparison complete", timeout=2).show()
+    except Exception as e:
+      alert(f"Error comparing texts: {str(e)}")
 
   def search_button_click(self, **event_args):
     try:
@@ -55,18 +72,25 @@ class CompareTranscription(CompareTranscriptionTemplate):
         alert("Please enter a search term.")
         return
 
-      # Add simple notification to show we're searching
-      Notification("Searching for videos...", timeout=2).show()
-      
+      # First test the server connection with a simple function
       try:
-        # Call the server function with a short timeout
-        results = anvil.server.call('search_youtube_videos', query)
+        Notification("Testing server connection...", timeout=2).show()
+        test_result = anvil.server.call('test_server_function')
+        Notification(f"Server test: {test_result['message']}", timeout=2).show()
       except Exception as e:
-        # Handle server errors
-        alert(f"Server error: {str(e)}")
+        alert(f"Server connection test failed: {str(e)}")
+        return
+
+      # If server test passed, try the search
+      try:
+        Notification("Searching for videos...", timeout=2).show()
+        results = anvil.server.call('search_youtube_videos', query)
+        Notification(f"Search returned {len(results)} results", timeout=2).show()
+      except Exception as e:
+        alert(f"Server search error: {str(e)}")
         return
       
-      # Clear existing results
+      # Create results display
       results_container = ColumnPanel()
       results_container.spacing_above = "large"
       
