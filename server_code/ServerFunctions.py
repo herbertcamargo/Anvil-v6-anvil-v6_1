@@ -59,19 +59,19 @@ def search_youtube_videos(query):
   # Mock video results
   videos = [
     {
-      'id': 'video1',
+      'video_id': 'video1',
       'title': f'Sample video about {query}',
       'thumbnail': 'https://via.placeholder.com/320x180',
       'channel': 'Sample Channel'
     },
     {
-      'id': 'video2',
+      'video_id': 'video2',
       'title': f'Learn about {query} - Tutorial',
       'thumbnail': 'https://via.placeholder.com/320x180',
       'channel': 'Education Channel'
     },
     {
-      'id': 'video3',
+      'video_id': 'video3',
       'title': f'{query} for beginners',
       'thumbnail': 'https://via.placeholder.com/320x180',
       'channel': 'Tutorial Channel'

@@ -9,8 +9,9 @@ class VideoResultCard(VideoResultCardTemplate):
     self.init_components(**properties)
 
   def set_item(self, item):
+    self.item = item
     self.thumbnail_image.source = item['thumbnail']
-    self.title_label.content = item['title']
+    self.title_label.text = item['title']
 
   def form_show(self, **event_args):
     """This method is called when the form is shown on the page"""

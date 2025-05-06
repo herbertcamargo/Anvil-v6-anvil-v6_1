@@ -7,6 +7,15 @@ import anvil.users
 class CompareTranscription(CompareTranscriptionTemplate):
   def __init__(self, **properties):
     self.init_components(**properties)
+    # Initialize language dropdown
+    self.language_dropdown.items = [
+      ('English', 'en'),
+      ('Spanish', 'es'),
+      ('French', 'fr'),
+      ('German', 'de'),
+      ('Portuguese', 'pt')
+    ]
+    self.language_dropdown.selected_value = 'en'
 
   def compare_button_click(self, **event_args):
     user_text = self.user_input_box.text

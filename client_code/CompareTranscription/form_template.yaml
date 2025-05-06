@@ -24,7 +24,7 @@ components:
         text: Search
       type: Button
     - data_bindings:
-      - {code: 'self.item['''']', property: items, writeback: false}
+      - {property: items, writeback: false}
       layout_properties: {grid_position: 'PUKLKI,ZSKFQI'}
       name: results_repeater
       properties:
@@ -45,8 +45,9 @@ components:
       properties:
         spacing:
           margin: [null, null, '20', '10']
-        text: button_1
+        text: Compare Transcriptions
       type: Button
+      event_bindings: {click: compare_button_click}
     - layout_properties: {grid_position: 'FKZTAU,SFRWYI'}
       name: comparison_output
       properties:
