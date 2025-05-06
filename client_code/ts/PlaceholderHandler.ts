@@ -65,7 +65,8 @@ class PlaceholderHandler {
         this.abort();
         return;
       }
-      return originalOpen.apply(this, [method, url as string, ...args]);
+      // Since TypeScript is strict about the arguments, use any to bypass type checking for this method call
+      (originalOpen as any).apply(this, [method, url, ...args]);
     };
   }
 
@@ -76,9 +77,11 @@ class PlaceholderHandler {
    * @returns Data URI for the placeholder
    */
   private generatePlaceholder(width: number, height: number): string {
-    if (width <= 40 && height <= 40) {
-      return this.options.avatarPlaceholder;
+    // For 40x40 images, use a simple grey box without text
+    if (width === 40 && height === 40) {
+      return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}' viewBox='0 0 ${width} ${height}'%3E%3Crect width='${width}' height='${height}' fill='%23cccccc'/%3E%3C/svg%3E`;
     } else {
+      // For larger images, include dimensions text
       const fontSize = Math.max(12, Math.min(24, width/10));
       return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}' viewBox='0 0 ${width} ${height}'%3E%3Crect width='${width}' height='${height}' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='${fontSize}' text-anchor='middle' fill='%23666666'%3E${width}x${height}%3C/text%3E%3C/svg%3E`;
     }

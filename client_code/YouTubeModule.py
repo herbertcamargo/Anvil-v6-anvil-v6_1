@@ -269,8 +269,8 @@ class YouTubeIntegration:
     
     def add_placeholder_handler(self):
         """Add global handler to replace placeholder.com images with data URIs"""
-        # Create small avatar placeholder (40x40)
-        avatar_placeholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='10' text-anchor='middle' fill='%23666666'%3E?%3C/text%3E%3C/svg%3E"
+        # Create small avatar placeholder (40x40) - plain grey box
+        avatar_placeholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23cccccc'/%3E%3C/svg%3E"
         
         # Create a placeholder handler with our configuration
         placeholder_handler = anvil.js.window.PlaceholderHandler({
