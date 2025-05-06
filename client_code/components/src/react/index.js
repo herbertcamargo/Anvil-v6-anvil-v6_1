@@ -2,9 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import TodoList from './TodoList';
 import VideoProcessor from './VideoProcessor';
+import YouTubeSearch from './YouTubeSearch';
 
-// Export component classes for individual usage
-export { TodoList, VideoProcessor };
+// Export all components
+export {
+  VideoProcessor,
+  TodoList,
+  YouTubeSearch
+};
 
 // Function to render a React component into a DOM element
 export function renderComponent(componentName, containerId, props = {}) {

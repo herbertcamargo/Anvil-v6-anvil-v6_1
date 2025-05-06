@@ -1,9 +1,14 @@
 import { createApp } from 'vue';
 import TodoList from './TodoList.vue';
 import VideoProcessor from './VideoProcessor.vue';
+import YouTubeSearch from './YouTubeSearch.vue';
 
 // Export component classes for individual usage
-export { TodoList, VideoProcessor };
+export {
+  TodoList,
+  VideoProcessor,
+  YouTubeSearch
+};
 
 // Function to render a Vue component into a DOM element
 export function renderComponent(componentName, containerId, props = {}) {
@@ -15,7 +20,8 @@ export function renderComponent(componentName, containerId, props = {}) {
 
   const components = {
     TodoList: TodoList,
-    VideoProcessor: VideoProcessor
+    VideoProcessor: VideoProcessor,
+    YouTubeSearch: YouTubeSearch
   };
 
   const Component = components[componentName];
